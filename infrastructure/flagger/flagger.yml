@@ -41,3 +41,8 @@ spec:
   values:
     nodeSelector:
       kubernetes.io/os: linux
+    meshProvider: knative
+    metricsServer: http://flagger-prometheus:9090
+    prometheus:
+      install: true
+      retention: 2h    
