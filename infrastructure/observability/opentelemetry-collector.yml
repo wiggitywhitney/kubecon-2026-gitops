@@ -53,4 +53,4 @@ spec:
       app.kubernetes.io/name: otel-collector
   endpoints:
     - port: prometheus
-      interval: 15s
+      interval: 3s

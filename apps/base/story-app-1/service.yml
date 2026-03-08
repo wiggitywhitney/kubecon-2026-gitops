@@ -1,0 +1,39 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: story-app-1
+  namespace: my-namespace
+spec:
+  template:
+    metadata:
+      labels:
+        app: story-app-1a
+      annotations:
+        instrumentation.opentelemetry.io/inject-nodejs: "my-namespace/otel-instrumentation"
+    spec:
+      automountServiceAccountToken: false
+      serviceAccountName: supply-chain
+      containers:
+        - name: workload
+          image: wiggitywhitney/story-app-1a:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: OTEL_SERVICE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['app']
+            - name: ANTHROPIC_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: anthropic
+                  key: api-key
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            runAsUser: 1001
+            seccompProfile:
+              type: RuntimeDefault
