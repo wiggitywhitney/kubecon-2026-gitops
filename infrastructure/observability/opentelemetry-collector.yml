@@ -23,7 +23,6 @@ spec:
           explicit:
             buckets: [1]
         dimensions:
-          - name: service.name
           - name: gen_ai.evaluation.name
           - name: gen_ai.evaluation.score.label
           - name: gen_ai.evaluation.score.value
