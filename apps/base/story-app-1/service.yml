@@ -6,7 +6,7 @@ spec:
   template:
     metadata:
       labels:
-        app: story-app-1b
+        app: story-app-1a
       annotations:
         autoscaling.knative.dev/min-scale: "1"
         autoscaling.knative.dev/max-scale: "1"
