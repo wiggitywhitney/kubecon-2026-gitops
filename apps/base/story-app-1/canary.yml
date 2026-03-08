@@ -1,0 +1,25 @@
+---
+apiVersion: flagger.app/v1beta1
+kind: Canary
+metadata:
+  name: story-app-1
+spec:
+  provider: knative
+  targetRef:
+    apiVersion: serving.knative.dev/v1
+    kind: Service
+    name: story-app-1
+  progressDeadlineSeconds: 3600
+  analysis:
+    interval: 5s
+    threshold: 3
+    stepWeight: 10
+    maxWeight: 100
+    metrics:
+      - name: satisfaction-score-rate
+        templateRef:
+          name: satisfaction-score-rate
+          namespace: my-namespace
+        thresholdRange:
+          min: 5        # B must be ≥5pp better than A to keep advancing
+        interval: 5m

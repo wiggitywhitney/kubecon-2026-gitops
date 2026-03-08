@@ -1,0 +1,34 @@
+---
+apiVersion: flagger.app/v1beta1
+kind: MetricTemplate
+metadata:
+  name: satisfaction-score-rate
+spec:
+  provider:
+    type: prometheus
+    address: http://prometheus-prometheus.observability:9090
+  query: |
+    (
+      sum(rate(gen_ai_calls_total{
+        span_name="evaluate UserSatisfaction",
+        service_name="story-app-1b",
+        gen_ai_evaluation_score_label="thumbs_up"
+      }[{{ interval }}]))
+      /
+      sum(rate(gen_ai_calls_total{
+        span_name="evaluate UserSatisfaction",
+        service_name="story-app-1b"
+      }[{{ interval }}]))
+      -
+      sum(rate(gen_ai_calls_total{
+        span_name="evaluate UserSatisfaction",
+        service_name="story-app-1a",
+        gen_ai_evaluation_score_label="thumbs_up"
+      }[{{ interval }}]))
+      /
+      sum(rate(gen_ai_calls_total{
+        span_name="evaluate UserSatisfaction",
+        service_name="story-app-1a"
+      }[{{ interval }}]))
+    ) * 100
+    or on() vector(0)
