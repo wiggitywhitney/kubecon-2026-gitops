@@ -2,14 +2,13 @@ apiVersion: serving.knative.dev/v1
 kind: Service
 metadata:
   name: story-app-1
-  namespace: my-namespace
 spec:
   template:
     metadata:
       labels:
         app: story-app-1a
       annotations:
-        instrumentation.opentelemetry.io/inject-nodejs: "my-namespace/otel-instrumentation"
+        instrumentation.opentelemetry.io/inject-nodejs: "apps/otel-instrumentation"
     spec:
       automountServiceAccountToken: false
       serviceAccountName: supply-chain
