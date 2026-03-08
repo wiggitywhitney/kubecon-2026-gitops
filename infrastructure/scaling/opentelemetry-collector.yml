@@ -1,0 +1,42 @@
+---
+apiVersion: opentelemetry.io/v1beta1
+kind: OpenTelemetryCollector
+metadata:
+  name: otel-collector
+  namespace: observability
+spec:
+  mode: deployment
+  config:
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: 0.0.0.0:4317
+          http:
+            endpoint: 0.0.0.0:4318
+
+    connectors:
+      spanmetrics:
+        namespace: gen_ai
+        histogram:
+          explicit:
+            buckets: [1]
+        dimensions:
+          - name: service.name
+          - name: gen_ai.evaluation.name
+          - name: gen_ai.evaluation.score.label
+          - name: gen_ai.evaluation.score.value
+        metrics_flush_interval: 15s
+
+    exporters:
+      prometheus:
+        endpoint: 0.0.0.0:8889
+
+    service:
+      pipelines:
+        traces:
+          receivers: [otlp]
+          exporters: [spanmetrics]
+        metrics:
+          receivers: [spanmetrics]
+          exporters: [prometheus]
