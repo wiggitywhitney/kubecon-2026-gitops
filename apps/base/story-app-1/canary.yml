@@ -19,7 +19,7 @@ spec:
       - name: satisfaction-score-rate
         templateRef:
           name: satisfaction-score-rate
-          namespace: my-namespace
+          namespace: apps
         thresholdRange:
           min: 5        # B must be ≥5pp better than A to keep advancing
         interval: 5m
