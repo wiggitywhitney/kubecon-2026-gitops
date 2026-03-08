@@ -6,3 +6,4 @@ namespace: apps
 resources:
   - metrics.yml
   - canary.yml
+  - service.yml
