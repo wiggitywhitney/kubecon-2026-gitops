@@ -5,6 +5,7 @@ metadata:
   name: otel
   namespace: observability
 spec:
+  image: docker.io/otel/opentelemetry-collector-contrib:0.145.0
   mode: deployment
   config:
     receivers:
