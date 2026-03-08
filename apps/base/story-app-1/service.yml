@@ -6,7 +6,7 @@ spec:
   template:
     metadata:
       labels:
-        app: story-app-1a
+        app: story-app-1b
       annotations:
         instrumentation.opentelemetry.io/inject-nodejs: "otel-instrumentation"
     spec:
@@ -14,7 +14,7 @@ spec:
       serviceAccountName: supply-chain
       containers:
         - name: workload
-          image: wiggitywhitney/story-app-1a:latest
+          image: wiggitywhitney/story-app-1b:latest
           ports:
             - containerPort: 8080
           env:

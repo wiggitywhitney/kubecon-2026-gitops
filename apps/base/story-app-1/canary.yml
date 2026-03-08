@@ -11,7 +11,7 @@ spec:
     name: story-app-1
   progressDeadlineSeconds: 3600
   analysis:
-    interval: 5s
+    interval: 3s
     threshold: 3
     stepWeight: 10
     maxWeight: 100
