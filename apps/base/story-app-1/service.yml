@@ -16,7 +16,7 @@ spec:
       serviceAccountName: supply-chain
       containers:
         - name: workload
-          image: wiggitywhitney/story-app-1b:latest
+          image: wiggitywhitney/story-app-1a:latest
           ports:
             - containerPort: 8080
           env:
