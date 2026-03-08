@@ -5,8 +5,8 @@ metadata:
   name: otel
   namespace: observability
 spec:
-  image: docker.io/otel/opentelemetry-collector-contrib:0.145.0
   mode: deployment
+  image: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.145.0
   config:
     receivers:
       otlp:
@@ -16,6 +16,19 @@ spec:
           http:
             endpoint: 0.0.0.0:4318
 
+    processors:
+      transform:
+        error_mode: ignore
+        trace_statements:
+          # spanevent context: read event attributes and copy them onto the parent span
+          - context: spanevent
+            statements:
+              # only process the event we care about
+              - set(span.attributes["gen_ai.evaluation.score.label"], attributes["gen_ai.evaluation.score.label"])
+                where name == "gen_ai.evaluation.result"
+              - set(span.attributes["gen_ai.evaluation.score.value"], attributes["gen_ai.evaluation.score.value"])
+                where name == "gen_ai.evaluation.result"
+
     connectors:
       spanmetrics:
         namespace: gen_ai
@@ -23,9 +36,7 @@ spec:
           explicit:
             buckets: [1]
         dimensions:
-          - name: gen_ai.evaluation.name
-          - name: gen_ai.evaluation.score.label
-          - name: gen_ai.evaluation.score.value
+          - name: gen_ai.evaluation.score.label   # promoted from event → span attribute
         metrics_flush_interval: 15s
 
     exporters:
@@ -36,10 +47,12 @@ spec:
       pipelines:
         traces:
           receivers: [otlp]
+          processors: [transform]
           exporters: [spanmetrics]
         metrics:
           receivers: [spanmetrics]
           exporters: [prometheus]
+
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
