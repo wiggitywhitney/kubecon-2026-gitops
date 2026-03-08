@@ -4,3 +4,4 @@ kind: Kustomization
 resources:
 - opentelemetry-operator.yml
 - prometheus-operator.yml
+- opentelemetry-collector.yml
