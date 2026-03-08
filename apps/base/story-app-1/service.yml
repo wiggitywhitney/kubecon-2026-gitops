@@ -8,7 +8,7 @@ spec:
       labels:
         app: story-app-1a
       annotations:
-        instrumentation.opentelemetry.io/inject-nodejs: "apps/otel-instrumentation"
+        instrumentation.opentelemetry.io/inject-nodejs: "observability/otel-instrumentation"
     spec:
       automountServiceAccountToken: false
       serviceAccountName: supply-chain
