@@ -2,7 +2,7 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: apps-cloud
+  name: apps-platform
   namespace: kadras-system
 spec:
   interval: 1m
@@ -11,7 +11,7 @@ spec:
   sourceRef:
     kind: GitRepository
     name: gitops-configurer
-  path: ./apps/cloud
+  path: ./apps/platform
   targetNamespace: apps
   prune: true
   wait: true
