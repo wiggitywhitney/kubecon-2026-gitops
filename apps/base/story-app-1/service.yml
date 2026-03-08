@@ -18,10 +18,6 @@ spec:
           ports:
             - containerPort: 8080
           env:
-            - name: OTEL_SERVICE_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.labels['app']
             - name: ANTHROPIC_API_KEY
               valueFrom:
                 secretKeyRef:

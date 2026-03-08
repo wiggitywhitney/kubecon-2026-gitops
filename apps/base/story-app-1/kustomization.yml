@@ -4,6 +4,6 @@ kind: Kustomization
 namespace: apps
 
 resources:
+  - service.yml
   - metrics.yml
   - canary.yml
-  - service.yml
