@@ -15,10 +15,10 @@ spec:
         gen_ai_evaluation_score_label="thumbs_up"
       }[{{ interval }}]))
       /
-      sum(rate(gen_ai_calls_total{
+      (sum(rate(gen_ai_calls_total{
         span_name="evaluate UserSatisfaction",
         service_name="story-app-1b"
-      }[{{ interval }}]))
+      }[{{ interval }}])) > 0)
       -
       sum(rate(gen_ai_calls_total{
         span_name="evaluate UserSatisfaction",
@@ -26,9 +26,9 @@ spec:
         gen_ai_evaluation_score_label="thumbs_up"
       }[{{ interval }}]))
       /
-      sum(rate(gen_ai_calls_total{
+      (sum(rate(gen_ai_calls_total{
         span_name="evaluate UserSatisfaction",
         service_name="story-app-1a"
-      }[{{ interval }}]))
+      }[{{ interval }}])) > 0)
     ) * 100
     or on() vector(0)

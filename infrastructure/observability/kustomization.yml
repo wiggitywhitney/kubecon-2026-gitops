@@ -5,3 +5,4 @@ resources:
 - opentelemetry-operator.yml
 - prometheus-operator.yml
 - opentelemetry-collector.yml
+- datadog-secret.yml

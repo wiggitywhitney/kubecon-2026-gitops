@@ -7,6 +7,12 @@ metadata:
 spec:
   mode: deployment
   image: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.145.0
+  env:
+    - name: DD_API_KEY
+      valueFrom:
+        secretKeyRef:
+          name: datadog-secret
+          key: api-key
   config:
     receivers:
       otlp:
@@ -28,8 +34,15 @@ spec:
                 where name == "gen_ai.evaluation.result"
               - set(span.attributes["gen_ai.evaluation.score.value"], attributes["gen_ai.evaluation.score.value"])
                 where name == "gen_ai.evaluation.result"
+      batch:
+        timeout: 10s
 
     connectors:
+      datadog/connector:
+        traces:
+          compute_stats_by_span_kind: true
+          compute_top_level_by_span_kind: true
+          peer_tags_aggregation: true
       spanmetrics:
         namespace: gen_ai
         histogram:
@@ -40,6 +53,10 @@ spec:
         metrics_flush_interval: 15s
 
     exporters:
+      datadog:
+        api:
+          key: ${env:DD_API_KEY}
+          site: datadoghq.com
       prometheus:
         endpoint: 0.0.0.0:8889
 
@@ -47,11 +64,12 @@ spec:
       pipelines:
         traces:
           receivers: [otlp]
-          processors: [transform]
-          exporters: [spanmetrics]
+          processors: [transform, batch]
+          exporters: [spanmetrics, datadog/connector, datadog]
         metrics:
-          receivers: [spanmetrics]
-          exporters: [prometheus]
+          receivers: [spanmetrics, datadog/connector]
+          processors: [batch]
+          exporters: [prometheus, datadog]
 
 ---
 apiVersion: monitoring.coreos.com/v1
