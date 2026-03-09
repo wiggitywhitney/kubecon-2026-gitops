@@ -19,6 +19,13 @@ spec:
           image: wiggitywhitney/story-app-1a:latest
           ports:
             - containerPort: 8080
+          resources:
+            requests:
+              cpu: 500m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 512Mi
           env:
             - name: ANTHROPIC_API_KEY
               valueFrom:
