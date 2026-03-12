@@ -34,6 +34,8 @@ spec:
                 where name == "gen_ai.evaluation.result"
               - set(span.attributes["gen_ai.evaluation.score.value"], attributes["gen_ai.evaluation.score.value"])
                 where name == "gen_ai.evaluation.result"
+              - set(span.attributes["story.part"], attributes["story.part"])
+                where name == "gen_ai.evaluation.result"
       batch:
         timeout: 10s
 
@@ -50,6 +52,7 @@ spec:
             buckets: [1]
         dimensions:
           - name: gen_ai.evaluation.score.label   # promoted from event → span attribute
+          - name: story.part                       # story part number (1-5)
         metrics_flush_interval: 15s
 
     exporters:
