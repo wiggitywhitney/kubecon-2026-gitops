@@ -8,8 +8,8 @@ spec:
       labels:
         app: story-app-1a
       annotations:
-        autoscaling.knative.dev/min-scale: "1"
-        autoscaling.knative.dev/max-scale: "1"
+        autoscaling.knative.dev/min-scale: "0"
+        autoscaling.knative.dev/max-scale: "5"
         instrumentation.opentelemetry.io/inject-nodejs: "otel-instrumentation"
     spec:
       automountServiceAccountToken: false
@@ -21,11 +21,11 @@ spec:
             - containerPort: 8080
           resources:
             requests:
+              cpu: 200m
+              memory: 128Mi
+            limits:
               cpu: 500m
               memory: 256Mi
-            limits:
-              cpu: "1"
-              memory: 512Mi
           env:
             - name: ANTHROPIC_API_KEY
               valueFrom:
