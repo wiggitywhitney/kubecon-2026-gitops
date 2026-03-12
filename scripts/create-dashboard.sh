@@ -324,6 +324,12 @@ if [[ "$HTTP_CODE" -ge 200 && "$HTTP_CODE" -lt 300 ]]; then
   DASHBOARD_URL=$(echo "$BODY" | python3 -c "import sys,json; print(json.load(sys.stdin)['url'])" 2>/dev/null || true)
   DASHBOARD_ID=$(echo "$BODY" | python3 -c "import sys,json; print(json.load(sys.stdin)['id'])" 2>/dev/null || true)
 
+  if [[ -z "$DASHBOARD_ID" ]]; then
+    echo "ERROR: Failed to parse dashboard ID from response" >&2
+    echo "$BODY" >&2
+    exit 1
+  fi
+
   echo "Dashboard created successfully!"
   echo ""
   echo "  ID:  ${DASHBOARD_ID}"
