@@ -18,7 +18,9 @@ fail() { echo "[FAIL] $*" >&2; exit 1; }
 
 secret_param() {
   if [[ -n "$ADMIN_SECRET" ]]; then
-    echo "?secret=${ADMIN_SECRET}"
+    local encoded
+    encoded=$(printf '%s' "$ADMIN_SECRET" | jq -sRr @uri 2>/dev/null || printf '%s' "$ADMIN_SECRET")
+    echo "?secret=${encoded}"
   fi
 }
 
@@ -96,7 +98,7 @@ fail_count=0
 
 for ((i = 1; i <= TOTAL_VOTES; i++)); do
   # Determine vote type based on ratio
-  threshold=$(echo "$THUMBS_UP_RATIO * 1000" | bc | cut -d. -f1)
+  threshold=$(awk "BEGIN {printf \"%d\", $THUMBS_UP_RATIO * 1000}")
   random=$((RANDOM % 1000))
   if [[ $random -lt $threshold ]]; then
     vote="thumbs_up"
