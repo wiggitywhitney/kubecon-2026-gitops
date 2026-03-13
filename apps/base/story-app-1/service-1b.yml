@@ -1,12 +1,12 @@
 apiVersion: serving.knative.dev/v1
 kind: Service
 metadata:
-  name: story-app-1
+  name: story-app-1b
 spec:
   template:
     metadata:
       labels:
-        app: story-app-1a
+        app: story-app-1b
       annotations:
         autoscaling.knative.dev/min-scale: "0"
         autoscaling.knative.dev/max-scale: "5"
@@ -16,7 +16,7 @@ spec:
       serviceAccountName: supply-chain
       containers:
         - name: workload
-          image: wiggitywhitney/story-app-1a:latest
+          image: wiggitywhitney/story-app-1b:latest
           ports:
             - containerPort: 8080
           resources:
