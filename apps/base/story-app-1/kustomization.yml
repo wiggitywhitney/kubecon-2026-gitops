@@ -5,5 +5,7 @@ namespace: apps
 
 resources:
   - service.yml
+  - service-1b.yml
+  - instrumentation.yml
   - metrics.yml
   - canary.yml

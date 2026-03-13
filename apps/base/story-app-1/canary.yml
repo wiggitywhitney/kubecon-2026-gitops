@@ -22,4 +22,4 @@ spec:
           namespace: apps
         thresholdRange:
           min: 5        # B must be ≥5pp better than A to keep advancing
-        interval: 5m
+        interval: 2m
