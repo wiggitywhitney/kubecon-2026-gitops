@@ -148,6 +148,12 @@ Audience votes → App span events → Collector transforms → Prometheus metri
 | 2026-03-14 | Standalone slides (not visual-aid-only) | Slides should be readable async, so attendees (and Thomas) can review without the presenter. |
 | 2026-03-14 | Two live demo rounds interleaved with teaching | Audience experiences the magic first (Round 1), then learns how it works, then experiences it again with understanding (Round 2). More engaging than explain-then-demo. |
 | 2026-03-14 | Mermaid for diagrams (not custom SVG or images) | Mermaid is version-controllable, diffable, and editable in markdown. Known Quarto+Reveal.js rendering quirks exist but basic flowcharts work fine. |
+| 2026-03-14 | Progressive reveals via separate slides (not fragments) | Each click = one idea. Mermaid SVGs are static, so fragments don't work inside diagrams anyway. Use `data-transition="none"` so content appears in place. |
+| 2026-03-14 | Stable diagram layouts with invisible placeholders | All progressive diagram slides use the full final diagram with unrevealed nodes styled invisible (`fill:none, stroke:none`). Prevents disorienting rescaling between clicks. |
+| 2026-03-14 | No spoilers before audience interaction | Don't reveal variant details (dry vs funny, model names) before voting. Reveal afterward for dramatic effect. |
+| 2026-03-14 | Max 1-2 lines below diagrams | Conference readability: text below diagrams gets cut off at the bottom of slides. Move details to speaker notes. |
+| 2026-03-14 | Teal/cyan accent (#00897B), sparingly | Accent on section headers, bold text, table headers. Not overdone. |
+| 2026-03-14 | "Platform" not "system" | When referring to the infrastructure making decisions, use "platform" — it's more specific and accurate. |
 
 ## Source Files for Diagram Accuracy
 
