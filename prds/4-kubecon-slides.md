@@ -111,9 +111,10 @@ Audience votes → App span events → Collector transforms → Prometheus metri
 - **What**: Same audience interaction, but now they understand the infrastructure
 - **Variants**: 2a (Haiku 4.5, cheap) vs 2b (Opus 4.6, expensive)
 - **On screen**: Datadog dashboard + Flagger canary progression
-- **Expected outcome**: Expensive model wins on satisfaction, canary promotes it
+- **Expected outcome**: Genuinely unknown. The expensive model might not win. That's the point.
 - **Duration**: ~3-4 minutes
-- **Dramatic tension**: The audience now knows their votes are controlling the rollout
+- **Dramatic tension**: The audience now knows their votes are controlling the rollout — and the outcome is live, not scripted
+- **Teaching point**: This is how a company decides whether spending more on a premium model is worthwhile. Don't assume the expensive option is better — instrument it, measure real user satisfaction, and let the data decide. The infrastructure doesn't care about price tags; it cares about thumbs up.
 
 ## Technical Stack
 
@@ -124,7 +125,7 @@ Audience votes → App span events → Collector transforms → Prometheus metri
 
 ## Milestones
 
-- [ ] **M1: Quarto project setup** — Initialize `slides/` directory with Quarto config, Reveal.js output format, Mermaid support, and a basic title slide. Verify `quarto preview` works locally.
+- [x] **M1: Quarto project setup** — Initialize `slides/` directory with Quarto config, Reveal.js output format, Mermaid support, and a basic title slide. Verify `quarto preview` works locally.
 
 - [ ] **M2: Talk skeleton with all sections** — Create the full slide outline with section headers, speaker notes placeholders, and empty diagram placeholders for all 6 scenes plus intro/outro. Establish the horizontal flow (sections) and vertical drill-down pattern.
 

@@ -1,0 +1,34 @@
+---
+title: "Scaling on Satisfaction"
+subtitle: "Using OpenTelemetry and User Feedback to Drive Canary Deployments"
+author:
+  - Whitney Lee
+  - Thomas Vitale
+date: "2026-03-31"
+---
+
+## What We're Building
+
+A live feedback loop where **audience votes** drive infrastructure decisions.
+
+::: {.notes}
+Welcome slide. Set context for what the audience will experience during this talk.
+Two live demo rounds, interleaved with teaching scenes that pull back the curtain.
+:::
+
+## Architecture Overview
+
+```{mermaid}
+%%| fig-width: 10
+flowchart LR
+  A[Audience Votes] --> B[OTel Spans]
+  B --> C[Collector]
+  C --> D[Prometheus]
+  D --> E[Flagger]
+  E --> F[Traffic Split]
+  F --> A
+```
+
+::: {.notes}
+High-level feedback loop. Each component will get its own deep-dive scene later in the talk.
+:::
