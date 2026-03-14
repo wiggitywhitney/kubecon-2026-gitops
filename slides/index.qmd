@@ -294,16 +294,16 @@ There were **two versions** of that story.
 The big reveal. The audience didn't know there were two variants. Now show the Datadog dashboard — the funnier variant should have higher satisfaction. Point out that the system was already shifting traffic toward the winner while they were voting.
 :::
 
-## Round 1: What Just Happened? {data-transition="none"}
+## {.center data-transition="none"}
 
-The system **shifted traffic** toward the variant you liked more.
+<h2 style="font-size: 1.6em; margin-bottom: 1em;">Round 1: What Just Happened?</h2>
 
-. . .
+<p style="font-size: 1.3em; margin-bottom: 1.2em;">The platform **shifted traffic** toward the variant you liked more.</p>
 
-But how did it know?
+<p style="font-size: 1.3em;">Now let's look at exactly how.</p>
 
 ::: {.notes}
-Tease the mechanism. Don't explain yet — just establish that something automatic happened. "The system automatically shifted traffic toward the variant with more thumbs up. But how? Let's pull back the curtain."
+Transition to teaching scenes. The audience saw the feedback loop diagram in Scene 2, but now we'll dig into each component: how votes become telemetry, how the collector turns telemetry into metrics, and how Flagger uses those metrics to shift traffic.
 :::
 
 # How It Works {.center}
