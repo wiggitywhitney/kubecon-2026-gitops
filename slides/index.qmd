@@ -15,106 +15,163 @@ A live feedback loop where **audience votes** drive infrastructure decisions.
 Welcome slide. Set context: in this talk, the audience will participate in two live demo rounds. Their votes on AI-generated stories will literally control the infrastructure — Flagger shifts traffic based on which variant gets more thumbs up. Between demos, we pull back the curtain and show how it all works.
 :::
 
-## Talk Roadmap
-
-1. Meet the app
-2. **Round 1**: You vote (experience the magic)
-3. How it works (telemetry → metrics → decisions)
-4. **Round 2**: You vote again (now you know the stakes)
-5. The full feedback loop
-
-::: {.notes}
-Roadmap slide. Give the audience a preview of the structure so they know when they'll be participating. Two live demo rounds, with the teaching in between.
-:::
-
 # The App {.center}
 
 ::: {.notes}
 Section divider: Scene 1 — What the audience sees. Ground them in the user experience before any infrastructure talk.
 :::
 
-## Scene 1: What You'll See
-
-:::: {.columns}
-::: {.column width="45%"}
-**Your phone shows:**
-
-- A short AI-generated story (5 parts)
-- Thumbs up / thumbs down buttons
-- You vote on each part as you read
-:::
-::: {.column width="10%"}
-:::
-::: {.column width="45%"}
-**What you don't know:**
-
-- Two variants of the app are running
-- You've been randomly assigned to one
-- Your votes are being compared
-:::
-::::
+## Scene 1: What You'll See {.center}
 
 ::: {.notes}
-Scene 1: The App — What the Audience Sees.
-The audience sees a simple phone UI: story text and two vote buttons. They don't know they're in an A/B test. Two Knative Services are running simultaneously with different container images. Knative routes each user to one variant. Round 1: same story, different tones (dry vs funny), same model. Round 2: same story, same tone, different models (cheap vs expensive).
+Scene 1 opening — blank title slide. Pause here before revealing details one at a time.
 :::
 
-## Scene 2: App Architecture
+## Scene 1: What You'll See {data-transition="none"}
+
+You'll open a URL on your phone
+
+::: {.notes}
+First reveal: just the basic action. The audience will open a URL.
+:::
+
+## Scene 1: What You'll See {data-transition="none"}
+
+You'll open a URL on your phone
+
+You'll read a short **AI-generated story** (5 parts)
+
+::: {.notes}
+Second reveal: the content. AI-generated story, 5 parts. The story is about 100 words per part, with named characters.
+:::
+
+## Scene 1: What You'll See {data-transition="none"}
+
+You'll open a URL on your phone
+
+You'll read a short **AI-generated story** (5 parts)
+
+After each part, you vote: **thumbs up** or **thumbs down**
+
+::: {.notes}
+Third reveal: the interaction. Thumbs up or thumbs down on each part. Simple binary feedback.
+:::
+
+## Scene 1: What You'll See {data-transition="none"}
+
+You'll open a URL on your phone
+
+You'll read a short **AI-generated story** (5 parts)
+
+After each part, you vote: **thumbs up** or **thumbs down**
+
+What you **don't** know...
+
+::: {.notes}
+Fourth reveal: the tease. Pause here for dramatic effect before revealing the hidden mechanics.
+:::
+
+## Scene 1: What You'll See {data-transition="none"}
+
+You'll open a URL on your phone
+
+You'll read a short **AI-generated story** (5 parts)
+
+After each part, you vote: **thumbs up** or **thumbs down**
+
+What you **don't** know: **two variants** of the app exist
+
+::: {.notes}
+Fifth reveal: two variants exist. Everyone starts on variant A (the boring one). As votes come in, the system decides whether to shift traffic to variant B. The audience doesn't know this is happening.
+:::
+
+## Scene 1: What You'll See {data-transition="none"}
+
+You'll open a URL on your phone
+
+You'll read a short **AI-generated story** (5 parts)
+
+After each part, you vote: **thumbs up** or **thumbs down**
+
+What you **don't** know: **two variants** of the app exist
+
+Your votes **control what happens next**
+
+::: {.notes}
+Sixth reveal: the punchline. Their votes aren't just feedback — they're driving infrastructure decisions in real time. The system will shift traffic based on which variant gets more thumbs up. Don't explain the mechanism yet. Let them sit with the mystery before moving to Scene 2.
+:::
+
+## Scene 2: Two Apps, One Stage {data-transition="none"}
+
+```{mermaid}
+%%| fig-width: 10
+flowchart LR
+  A["Variant A<br/>story-app-1a"] ~~~ B["Variant B<br/>story-app-1b"]
+```
+
+Two Knative Services running **different container images**
+
+Not feature flags — actually different apps
+
+::: {.notes}
+Scene 2, step 1: Start simple. Two Knative Services running side by side. Different images, different behavior. The key insight: variant differentiation via container images, not feature flags. Each has a pod label (app: story-app-1a vs story-app-1b) that becomes the OTel service.name via the Instrumentation CR.
+:::
+
+## Scene 2: The Audience Connects {data-transition="none"}
+
+```{mermaid}
+%%| fig-width: 10
+flowchart LR
+  audience["Audience"] --> A["Variant A"]
+  audience --> B["Variant B"]
+```
+
+Each phone is routed to **one variant** — you don't pick
+
+Knative handles the traffic split
+
+::: {.notes}
+Scene 2, step 2: The audience connects. Knative routes each request to one of the two services. The audience doesn't choose — they're assigned. This is the A/B test mechanism: different services, random assignment, same URL.
+:::
+
+## Scene 2: The SpanContext Round-Trip {data-transition="none"}
+
+```{mermaid}
+%%| fig-width: 10
+flowchart LR
+  S["Server"] -->|"story + spanContext"| P["Phone"]
+  P -->|"vote + spanContext"| S
+```
+
+Server returns **spanContext** with the story
+
+Phone sends it **back** with the vote
+
+This links "user liked this" → "generated by model X"
+
+::: {.notes}
+Scene 2, step 3: The spanContext round-trip. This is the non-obvious OTel pattern. When the server generates a story, it captures the span context from the generation span and returns it to the client along with the story text. When the user votes, the client sends that span context back. The server uses it to create a linked evaluation span. This means in your traces, you can navigate from "user voted thumbs up on part 3" directly to "this was generated by Sonnet 4 with these parameters."
+:::
+
+## Scene 2: Full Architecture {data-transition="none"}
 
 ```{mermaid}
 %%| fig-width: 10
 flowchart TB
-  subgraph k8s["Kubernetes (apps namespace)"]
-    subgraph va["Knative Service: story-app-1"]
-      A1["story-app-1a:latest<br/>label: app=story-app-1a<br/>VARIANT_STYLE=dry"]
-    end
-    subgraph vb["Knative Service: story-app-1b"]
-      B1["story-app-1b:latest<br/>label: app=story-app-1b<br/>VARIANT_STYLE=funny"]
-    end
-    admin["Admin Panel<br/>(advances all variants<br/>via VARIANT_URLS)"]
-  end
-  audience["Audience phones"] -->|"GET /api/story/:part"| va
-  audience -->|"GET /api/story/:part"| vb
-  va -->|"{text, responseId, spanContext}"| audience
-  vb -->|"{text, responseId, spanContext}"| audience
-  audience -->|"POST /api/story/:part/vote<br/>{vote, responseId, spanContext}"| va
-  audience -->|"POST /api/story/:part/vote<br/>{vote, responseId, spanContext}"| vb
-  admin -.->|"advance story part"| va
-  admin -.->|"advance story part"| vb
+  audience["Audience phones"]
+  audience --> va["Variant A<br/>story-app-1a"]
+  audience --> vb["Variant B<br/>story-app-1b"]
+  admin["Admin Panel"] -.->|"advance"| va
+  admin -.->|"advance"| vb
+  va & vb -->|"spans + events"| collector["OTel Collector"]
 ```
 
-::: {.notes}
-Scene 2: The App Architecture.
-Two Knative Services with different container images — not feature flags, actual different images. The pod label (app: story-app-1a vs story-app-1b) becomes the OTel service.name via the Instrumentation CR: OTEL_SERVICE_NAME pulls from metadata.labels['app']. This is how the metrics pipeline distinguishes A from B downstream.
+Admin panel advances the story for **everyone at once**
 
-The spanContext round-trip is the key OTel pattern: generation returns spanContext to the client, client sends it back with the vote, server links the evaluation span to the generation span. This is how you connect "user liked this" back to "this was generated by model X."
-
-Stateless design: no per-user sessions. Any replica can serve any request. Knative scales 0→N (min 0, max 5). Admin panel coordinates all variants — one button press advances the story for everyone.
-:::
-
-## The SpanContext Round-Trip
-
-```{mermaid}
-%%| fig-width: 10
-sequenceDiagram
-  participant P as Phone
-  participant S as Server
-  participant A as Anthropic API
-
-  P->>S: GET /api/story/3
-  S->>A: Generate story (chat sonnet-4)
-  A-->>S: Story text
-  Note right of S: Captures spanContext<br/>from generation span
-  S-->>P: {text, responseId, spanContext}
-  Note left of P: Stores spanContext<br/>for later
-  P->>P: User reads, taps 👍
-  P->>S: POST /api/story/3/vote<br/>{vote: thumbs_up, responseId, spanContext}
-  Note right of S: Creates evaluate span<br/>linked to generation via spanContext
-```
+Both variants send telemetry to the same collector
 
 ::: {.notes}
-Scene 2 continued: The SpanContext Round-Trip.
-This is the non-obvious OTel pattern. The generation span context is returned to the client as data, then sent back with the vote. The server uses it to create a linked evaluation span. This means in your traces, you can navigate from "user voted thumbs up on part 3" directly to "this was generated by Sonnet 4 with these parameters." That linkage is what makes the metrics pipeline possible — without it, votes are just numbers without context.
+Scene 2, step 4: Full picture. The admin panel coordinates all variants — one button press advances the story part for all services via VARIANT_URLS. Both variants send OTel spans to the same collector, which is how we compare them. Stateless design: no per-user sessions, any replica can serve any request. Knative scales 0→N (min 0, max 5).
 :::
 
 # Round 1: Live Demo {.center}
@@ -123,22 +180,46 @@ This is the non-obvious OTel pattern. The generation span context is returned to
 Section divider: Round 1 Live Demo. Audience experiences the app for the first time.
 :::
 
-## Time to Vote!
+## Round 1: The Setup
 
-<!-- TODO (M4): Audience URL display, QR code, instructions -->
-<!-- TODO (M4): Datadog dashboard embed/screenshot placeholder -->
+**Two variants, same model (Claude Sonnet 4):**
+
+| | Variant A | Variant B |
+|---|---|---|
+| **Story** | Nyx on the Moon | Nyx on the Moon |
+| **Tone** | Dry, matter-of-fact | Funny, playful |
+| **Model** | Sonnet 4 | Sonnet 4 |
+
+You won't know which one you get.
 
 ::: {.notes}
-Round 1 demo slide.
-Variants: 1a (dry tone) vs 1b (funny tone), same model (Sonnet 4). Show Datadog dashboard with votes coming in, satisfaction rates per variant. Expected outcome: funny variant wins, Flagger shifts traffic. Duration: ~3-4 minutes of active voting across 2-3 story parts. PRESENTER CUE: Have dashboard on screen before revealing the URL.
+PRESENTER CUE: Explain the setup before showing the URL. Both variants use the same model — the only difference is tone. The audience doesn't know which variant they're assigned to. After explaining, switch to the Datadog dashboard on screen, THEN reveal the URL.
 :::
 
-## Round 1: What Happened
+## Time to Vote! {.center}
 
-<!-- TODO (M4): Results summary slide — which variant won, how traffic shifted -->
+<!-- TODO (M7): Replace with actual audience URL and QR code -->
+
+### Open on your phone:
+
+**[story-app.kubecon.dev](https://story-app.kubecon.dev)**
+
+Read each story part. Vote thumbs up or thumbs down.
 
 ::: {.notes}
-Debrief Round 1. Show the Datadog dashboard results. The funnier variant should have won. Tease: "But how did the system know? Let's pull back the curtain."
+PRESENTER CUE: Dashboard should already be on screen showing the Datadog TV mode URL: https://app.datadoghq.com/dashboard/68y-xeg-j6s?tv_mode=true. Advance story parts from the admin panel as votes come in. Let 2-3 story parts play out (~3-4 minutes). Watch the dashboard: votes per variant, satisfaction rates updating in real time.
+:::
+
+## Round 1: What Just Happened?
+
+The system chose the variant **you liked more**.
+
+. . .
+
+But how did it know?
+
+::: {.notes}
+Debrief Round 1. Show the Datadog dashboard results — which variant had higher satisfaction. The funnier variant should have won. Don't explain the mechanism yet — tease it. "The system automatically shifted traffic toward the variant with more thumbs up. But how? Let's pull back the curtain."
 :::
 
 # How It Works {.center}

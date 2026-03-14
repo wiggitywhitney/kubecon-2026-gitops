@@ -4,7 +4,7 @@ project:
 
 format:
   revealjs:
-    theme: default
+    theme: [default, custom.scss]
     slide-number: true
     transition: slide
     mermaid-format: svg

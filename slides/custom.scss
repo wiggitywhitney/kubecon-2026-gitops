@@ -1,0 +1,54 @@
+/*-- scss:defaults --*/
+
+// Teal/cyan accent palette
+$accent: #00897B;
+$accent-light: #4DB6AC;
+$accent-dark: #00695C;
+
+$link-color: $accent;
+$link-color-hover: $accent-dark;
+
+$body-color: #2d2d2d;
+$headings-color: #1a1a1a;
+
+// Slightly larger base font for readability at conference scale
+$presentation-font-size-root: 42px;
+$presentation-heading-font: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+$presentation-font-family-body: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+/*-- scss:rules --*/
+
+// Accent-colored section dividers
+.reveal section.center h1 {
+  color: $accent;
+  border-bottom: 3px solid $accent-light;
+  padding-bottom: 0.3em;
+  display: inline-block;
+}
+
+// Accent for bold text (subtle pop)
+.reveal strong {
+  color: $accent-dark;
+}
+
+// Table header accent
+.reveal table thead th {
+  background-color: $accent;
+  color: white;
+  border-bottom: 2px solid $accent-dark;
+}
+
+// Table rows
+.reveal table tbody tr:nth-child(even) {
+  background-color: rgba($accent-light, 0.08);
+}
+
+// Slide number styling
+.reveal .slide-number {
+  color: $accent;
+}
+
+// Speaker notes marker (visible only in speaker view)
+.reveal .notes {
+  border-left: 3px solid $accent-light;
+}
