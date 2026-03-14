@@ -127,7 +127,7 @@ Audience votes → App span events → Collector transforms → Prometheus metri
 
 - [x] **M1: Quarto project setup** — Initialize `slides/` directory with Quarto config, Reveal.js output format, Mermaid support, and a basic title slide. Verify `quarto preview` works locally.
 
-- [ ] **M2: Talk skeleton with all sections** — Create the full slide outline with section headers, speaker notes placeholders, and empty diagram placeholders for all 6 scenes plus intro/outro. Establish the horizontal flow (sections) and vertical drill-down pattern.
+- [x] **M2: Talk skeleton with all sections** — Create the full slide outline with section headers, speaker notes placeholders, and empty diagram placeholders for all 6 scenes plus intro/outro. Establish the horizontal flow (sections) and vertical drill-down pattern.
 
 - [ ] **M3: Scene 1-2 slides (App UX + Architecture)** — Build the app overview and architecture diagrams. These set context before Round 1.
 

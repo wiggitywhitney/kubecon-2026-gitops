@@ -46,3 +46,4 @@ Development progress log for kubecon-2026-gitops. Tracks implementation mileston
 - (2026-03-13) story-app-1b Knative Service variant for A/B testing — separate service with `app: story-app-1b` label for distinct `service_name` in spanmetrics (PRD #3, M3)
 - (2026-03-13) New load test script (`scripts/load-test-votes.sh`) for stateless app — handles warmup, admin advance, responseId capture, configurable vote ratio (PRD #3, M5)
 - (2026-03-14) Quarto + Reveal.js presentation project initialized in `slides/` — Mermaid SVG rendering, title slide with architecture overview diagram (PRD #4, M1)
+- (2026-03-14) Full talk skeleton with 19 slides: 6 teaching scenes, 2 demo rounds, intro/outro, section dividers, speaker notes, and diagram placeholders (PRD #4, M2)

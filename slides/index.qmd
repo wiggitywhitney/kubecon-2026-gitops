@@ -12,23 +12,176 @@ date: "2026-03-31"
 A live feedback loop where **audience votes** drive infrastructure decisions.
 
 ::: {.notes}
-Welcome slide. Set context for what the audience will experience during this talk.
-Two live demo rounds, interleaved with teaching scenes that pull back the curtain.
+Welcome slide. Set context: in this talk, the audience will participate in two live demo rounds. Their votes on AI-generated stories will literally control the infrastructure — Flagger shifts traffic based on which variant gets more thumbs up. Between demos, we pull back the curtain and show how it all works.
 :::
 
-## Architecture Overview
+## Talk Roadmap
 
-```{mermaid}
-%%| fig-width: 10
-flowchart LR
-  A[Audience Votes] --> B[OTel Spans]
-  B --> C[Collector]
-  C --> D[Prometheus]
-  D --> E[Flagger]
-  E --> F[Traffic Split]
-  F --> A
-```
+1. Meet the app
+2. **Round 1**: You vote (experience the magic)
+3. How it works (telemetry → metrics → decisions)
+4. **Round 2**: You vote again (now you know the stakes)
+5. The full feedback loop
 
 ::: {.notes}
-High-level feedback loop. Each component will get its own deep-dive scene later in the talk.
+Roadmap slide. Give the audience a preview of the structure so they know when they'll be participating. Two live demo rounds, with the teaching in between.
+:::
+
+# The App {.center}
+
+::: {.notes}
+Section divider: Scene 1 — What the audience sees. Ground them in the user experience before any infrastructure talk.
+:::
+
+## Scene 1: What You'll See
+
+<!-- TODO (M3): Phone screen mockup showing story text with thumbs up/down buttons -->
+<!-- TODO (M3): Two variants side by side — audience doesn't know which one they're getting -->
+
+::: {.notes}
+Scene 1: The App — What the Audience Sees.
+Show the phone UI. Two variants exist. Round 1: same story, different tones (dry vs funny), same model. Round 2: same story, same tone, different models (cheap vs expensive). The audience doesn't know which variant they're getting.
+:::
+
+## Scene 2: How the App Is Built
+
+<!-- TODO (M3): Container architecture diagram showing two Knative Services, shared admin panel, spanContext flow -->
+
+::: {.notes}
+Scene 2: The App Architecture.
+Stateless design — any replica can serve any request. Knative scales 0→N. Variant differentiation via container images (different env vars: VARIANT_STYLE, VARIANT_MODEL). service.name OTel attribute (from pod label) distinguishes A from B in the metrics pipeline. SpanContext round-trip: generation span context returned to client, sent back with vote, so evaluation links to generation. Coordinated admin panel advances all variants via VARIANT_URLS.
+:::
+
+# Round 1: Live Demo {.center}
+
+::: {.notes}
+Section divider: Round 1 Live Demo. Audience experiences the app for the first time.
+:::
+
+## Time to Vote!
+
+<!-- TODO (M4): Audience URL display, QR code, instructions -->
+<!-- TODO (M4): Datadog dashboard embed/screenshot placeholder -->
+
+::: {.notes}
+Round 1 demo slide.
+Variants: 1a (dry tone) vs 1b (funny tone), same model (Sonnet 4). Show Datadog dashboard with votes coming in, satisfaction rates per variant. Expected outcome: funny variant wins, Flagger shifts traffic. Duration: ~3-4 minutes of active voting across 2-3 story parts. PRESENTER CUE: Have dashboard on screen before revealing the URL.
+:::
+
+## Round 1: What Happened
+
+<!-- TODO (M4): Results summary slide — which variant won, how traffic shifted -->
+
+::: {.notes}
+Debrief Round 1. Show the Datadog dashboard results. The funnier variant should have won. Tease: "But how did the system know? Let's pull back the curtain."
+:::
+
+# How It Works {.center}
+
+::: {.notes}
+Section divider: Teaching scenes. Now we explain the infrastructure behind what they just experienced.
+:::
+
+## Scene 3: How a Vote Becomes Data
+
+<!-- TODO (M5): Incremental span hierarchy diagram -->
+<!-- Build 1: User taps thumbs up → app creates span: evaluate UserSatisfaction -->
+<!-- Build 2: Span event: gen_ai.evaluation.result with attributes -->
+<!-- Build 3: Link back to generation span via gen_ai.response.id -->
+
+::: {.notes}
+Scene 3: The Telemetry.
+Introduce OpenTelemetry and gen_ai semantic conventions. Key teaching points: span events (not just spans), gen_ai semantic conventions, linking evaluation to generation — the OTel-native way to capture user feedback on AI output.
+Incremental build: (1) user taps thumbs up, (2) app creates evaluate UserSatisfaction span, (3) span event gen_ai.evaluation.result with attributes (score.label, score.value, story.part), (4) link back to generation span via gen_ai.response.id.
+:::
+
+## Scene 4: From Events to Metrics
+
+<!-- TODO (M5): Incremental collector pipeline diagram -->
+<!-- Build 1: Traces arrive via OTLP -->
+<!-- Build 2: Transform processor promotes span event attributes to parent span -->
+<!-- Build 3: Spanmetrics connector converts spans to gen_ai_calls_total counter -->
+<!-- Build 4: Fork to Prometheus (in-cluster) + Datadog (dashboards) -->
+
+::: {.notes}
+Scene 4: The Collector — From Events to Metrics.
+The OTel Collector transforms raw telemetry into actionable metrics. Key teaching points: the transform "promotion" trick (spanmetrics reads span attributes, not events), spanmetrics as the bridge between traces and metrics, dual export decouples in-cluster decisions from visualization.
+Incremental build: (1) OTLP receiver, (2) transform processor, (3) spanmetrics connector → gen_ai_calls_total with dimensions, (4) fork to Prometheus exporter + Datadog exporter.
+:::
+
+## Scene 5: Flagger's Canary Logic
+
+<!-- TODO (M6): Incremental Flagger decision loop diagram -->
+<!-- Build 1: Prometheus scrapes gen_ai_calls_total every 3s -->
+<!-- Build 2: Flagger runs PromQL: (B thumbs_up %) - (A thumbs_up %) -->
+<!-- Build 3: Delta >= 5pp for 3 consecutive checks → advance traffic weight by 10% -->
+<!-- Build 4: Traffic split progression: 90/10 → 80/20 → ... → 0/100 -->
+<!-- Build 5: Delta drops below threshold → rollback to 100% A -->
+
+::: {.notes}
+Scene 5: The Decision — Flagger's Canary Logic.
+Show how metrics drive automated rollout decisions. Key teaching point: threshold is relative (B must be 5 percentage points better than A), not absolute. The system promotes the variant that makes users happier.
+Incremental build: (1) Prometheus scrapes collector, (2) Flagger runs PromQL query, (3) threshold check, (4) traffic split progression, (5) rollback if delta drops.
+:::
+
+# Round 2: Live Demo {.center}
+
+::: {.notes}
+Section divider: Round 2 Live Demo. Now the audience understands the infrastructure — their votes have new meaning.
+:::
+
+## Time to Vote — Again!
+
+<!-- TODO (M4): Same structure as Round 1 but with Round 2 context -->
+<!-- TODO (M4): Datadog dashboard + Flagger canary progression view -->
+
+::: {.notes}
+Round 2 demo slide.
+Variants: 2a (Haiku 4.5, cheap) vs 2b (Opus 4.6, expensive). Same audience interaction, but now they understand the infrastructure. Expected outcome: genuinely unknown — the expensive model might not win. That's the point. Duration: ~3-4 minutes. Dramatic tension: the audience now knows their votes are controlling the rollout, and the outcome is live, not scripted.
+PRESENTER CUE: Emphasize that this outcome is NOT predetermined.
+:::
+
+## Round 2: What Happened
+
+<!-- TODO (M4): Results, canary progression, which model won -->
+
+::: {.notes}
+Debrief Round 2. Show Datadog dashboard + Flagger canary progression. Teaching point: this is how a company decides whether spending more on a premium model is worthwhile. Don't assume the expensive option is better — instrument it, measure real user satisfaction, and let the data decide. The infrastructure doesn't care about price tags; it cares about thumbs up.
+:::
+
+# The Full Loop {.center}
+
+::: {.notes}
+Section divider: Scene 6 — Closing the feedback loop. Tie everything together.
+:::
+
+## Scene 6: Closing the Feedback Loop
+
+<!-- TODO (M6): Full architecture diagram with the feedback loop highlighted -->
+<!-- Complete pipeline: Audience votes → App span events → Collector transforms → Prometheus metrics → Flagger queries → Knative traffic split → Audience gets more of the better variant → More votes → ... -->
+
+::: {.notes}
+Scene 6: The Full Loop.
+Show the complete cycle — audience votes are literally controlling the infrastructure. This is a closed-loop system. Subjective user experience (thumbs up/down) drives infrastructure decisions. This is what "scaling on satisfaction" means.
+:::
+
+## What We Built Together
+
+- **OpenTelemetry** gen_ai semantic conventions capture user satisfaction
+- **OTel Collector** transforms span events into actionable metrics
+- **Flagger** uses those metrics to make canary deployment decisions
+- **You** drove the infrastructure with your votes
+
+::: {.notes}
+Wrap-up slide. Recap the key technologies and the audience's role. Emphasize: this isn't hypothetical — they just did it, live.
+:::
+
+## Thank You
+
+Whitney Lee · Thomas Vitale
+
+<!-- TODO (M7): Links, QR codes, social handles, repo URLs -->
+
+::: {.notes}
+Closing slide. Links to repos, slides, social handles. Thank the audience for participating.
 :::
