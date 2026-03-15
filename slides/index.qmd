@@ -198,12 +198,10 @@ PRESENTER CUE: Keep this simple — don't reveal that there are two variants or 
 
 ### Scan the QR code
 
-<!-- PRESENTER CUE: Open the app in Chrome on your laptop, right-click, "Create QR code for this page", project it -->
-
 Read each story part. Vote thumbs up or thumbs down.
 
 ::: {.notes}
-PRESENTER CUE: Advance story parts from the admin panel as votes come in. Let 2-3 story parts play out (~3-4 minutes). When ready, click through to the dashboard slide.
+PRESENTER CUE: Open the app in Chrome on your laptop, right-click, "Create QR code for this page", project it. Advance story parts from the admin panel as votes come in. Let 2-3 story parts play out (~3-4 minutes). When ready, click through to the dashboard slide.
 :::
 
 ## [Live Dashboard](https://app.datadoghq.com/dashboard/68y-xeg-j6s?tv_mode=true) {.center}
