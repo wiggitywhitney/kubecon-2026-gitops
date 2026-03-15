@@ -259,41 +259,47 @@ Scene 3 title slide. This is where we introduce OpenTelemetry for the first time
 
 ```{mermaid}
 %%| fig-width: 10
-flowchart LR
-  user["You"] -->|"thumbs up"| app["App"]
+graph TD
+  user["You"] -->|"👍"| server["Server"]
 ```
 
 ::: {.notes}
-Start simple. The user taps thumbs up. What happens inside the app?
+Start simple. The user taps thumbs up. What happens inside the server?
 :::
 
-## The App Creates a Span {data-transition="none"}
+## The Server Creates a Span {data-transition="none"}
 
 ```{mermaid}
 %%| fig-width: 10
-flowchart LR
-  user["You"] -->|"thumbs up"| app["App"]
-  app --> span["evaluate UserSatisfaction<br/>(span)"]
+graph TD
+  user["You"] -->|"👍"| server["Server"]
+  server --> span
+  subgraph otel ["OpenTelemetry"]
+    span["evaluate UserSatisfaction<br/>(span)"]
+  end
+  style span fill:#e8f5f3,stroke:#00897B
+  style otel fill:none,stroke:#00897B,stroke-width:2px
 ```
 
-The app creates an **OpenTelemetry span** — a unit of work
+The server creates an **OpenTelemetry span** — a unit of work
 
 ::: {.notes}
-First mention of OpenTelemetry. A span is a structured unit of work — connected to other spans in a trace. The app creates one called "evaluate UserSatisfaction" every time someone votes.
+First mention of OpenTelemetry. A span is a structured unit of work — connected to other spans in a trace. The server creates one called "evaluate UserSatisfaction" every time someone votes.
 :::
 
 ## The Vote Creates a Span Event {data-transition="none"}
 
 ```{mermaid}
 %%| fig-width: 10
-flowchart LR
-  user["You"] -->|"thumbs up"| app["App"]
-  app --> grp
-  subgraph grp [" "]
-    direction TB
+graph TD
+  user["You"] -->|"👍"| server["Server"]
+  server --> span
+  subgraph otel ["OpenTelemetry"]
     span["evaluate UserSatisfaction<br/>(span)"] -->|"timestamp"| event["gen_ai.evaluation.result<br/>(span event)"]
   end
-  style grp fill:none,stroke:none
+  style span fill:#e8f5f3,stroke:#00897B
+  style event fill:#e0f2f1,stroke:#4DB6AC
+  style otel fill:none,stroke:#00897B,stroke-width:2px
 ```
 
 The vote is recorded as a **span event** inside the span
@@ -334,7 +340,7 @@ A span event is a thing that happened during a span — like a log entry, but it
 This is the "why should I care" beat. The attributes on the span event aren't made up — they follow gen_ai semantic conventions. score.label = thumbs_up, score.value = 1.0, story.part = 3. Because these are standardized, any OTel tool (Datadog, Jaeger, Grafana) can read and act on them without custom configuration.
 :::
 
-## The Journey of a 👍 {data-transition="none"}
+## The Journey of a 👍 {data-transition="fade"}
 
 ```{mermaid}
 %%| fig-width: 10
@@ -346,7 +352,7 @@ sequenceDiagram
 ```
 
 ::: {.notes}
-Empty diagram — just the four participants. Set the stage.
+Empty diagram — just the four participants. Fade transition from the previous flowchart for visual continuity.
 :::
 
 ## The Journey of a 👍 {data-transition="none"}
@@ -588,7 +594,7 @@ sequenceDiagram
   S->>C: 👍 + spans + events + 𝘀𝗽𝗮𝗻𝗖𝗼𝗻𝘁𝗲𝘅𝘁
 ```
 
-**spanContext** links storygen span to evaluate satisfaction span
+**spanContext** links **storygen** span to **evaluate satisfaction** span
 
 ::: {.notes}
 Everything flows to the OTel Collector via OTLP. The spanContext is what links the storygen span to the evaluate satisfaction span.
@@ -632,6 +638,24 @@ The punchline. OpenTelemetry now has the complete picture: what was generated, b
 
 ::: {.notes}
 PRESENTER CUE: Click this link to open Datadog APM traces filtered to evaluate satisfaction spans. Pick any trace, expand it, show the span event with its attributes. Quick aside — 30 seconds max — then back to slides. This only works if Thomas's cluster is running and has recent traffic.
+:::
+
+## {.center}
+
+<h2 style="font-size: 1.6em;">But how does an app scale on traces?</h2>
+
+::: {.notes}
+Let the question land. The audience has seen how votes become telemetry. But Flagger doesn't read traces — it reads metrics. How do we get from one to the other?
+:::
+
+## {.center}
+
+<h2 style="font-size: 1.6em; margin-bottom: 1em;">But how does an app scale on traces?</h2>
+
+<p style="font-size: 1.3em;">I thought Flagger uses Prometheus.</p>
+
+::: {.notes}
+The audience should be wondering this. Flagger uses PromQL queries against Prometheus metrics. But everything we've shown so far is traces and span events. This tension is exactly what Scene 4 resolves.
 :::
 
 ## From Events to Metrics
