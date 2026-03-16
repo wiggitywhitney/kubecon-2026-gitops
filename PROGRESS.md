@@ -54,6 +54,7 @@ Development progress log for kubecon-2026-gitops. Tracks implementation mileston
 - (2026-03-15) Tech stack research doc (slides/TECH-STACK-RESEARCH.md): Quarto Reveal.js capabilities, Mermaid diagram types, block-beta findings, Viktor Farcic styling patterns, Datadog embedding options
 - (2026-03-15) Scene 3 flowchart diagrams: graph TD with OpenTelemetry subgraph, teal-colored span/event boxes, progressive unroll from "You Tap Thumbs Up" through span creation to span event
 - (2026-03-15) "But how does an app scale on traces?" + "I thought Flagger uses Prometheus" bridge slides before Scene 4
+- (2026-03-16) Scene 4 collector pipeline: OTel Collector intro, processors definition with community examples, Transform + Spanmetrics alternating text/diagram unroll, Prometheus + Datadog fork unroll with description text (PRD #4, M5 complete)
 
 ### Changed
 - (2026-03-14) Extensive style refinements: teal accent theme, progressive reveals with data-transition=none, LR architecture diagrams, Scene 1 split into What You'll See / What You Don't See, removed spoilers before voting, decorative PNG images (resized to 800px)

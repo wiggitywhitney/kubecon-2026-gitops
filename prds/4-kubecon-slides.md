@@ -132,7 +132,7 @@ Audience votes → App span events → Collector transforms → Prometheus metri
 
 - [x] **M4: Live demo slides (Round 1 + Round 2)** — Create the "demo time" slides with Datadog dashboard placeholder/instructions, audience URL display, and presenter cue notes for both rounds.
 
-- [ ] **M5: Scene 3-4 slides (Telemetry + Collector)** — Build the OTel telemetry and collector pipeline diagrams with incremental reveal. These are the technical core of the talk. Include "what is a span event" beat, gen_ai semantic conventions explanation, Datadog APM trace link, and Collector intro slide. Update `slides/TALK-FLOW.md` to match final slide content.
+- [x] **M5: Scene 3-4 slides (Telemetry + Collector)** — Build the OTel telemetry and collector pipeline diagrams with incremental reveal. These are the technical core of the talk. Include "what is a span event" beat, gen_ai semantic conventions explanation, Datadog APM trace link, and Collector intro slide. Update `slides/TALK-FLOW.md` to match final slide content.
 
 - [ ] **M6: Scene 5-6 slides (Flagger + Full Loop)** — Build the Flagger canary logic and full feedback loop diagrams. Scene 6 ties everything together. Update `slides/TALK-FLOW.md` to match final slide content.
 

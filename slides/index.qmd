@@ -638,7 +638,7 @@ The punchline. OpenTelemetry now has the complete picture: what was generated, b
 PRESENTER CUE: Click this link to open Datadog APM traces filtered to evaluate satisfaction spans. Pick any trace, expand it, show the span event with its attributes. Quick aside — 30 seconds max — then back to slides. This only works if Thomas's cluster is running and has recent traffic.
 :::
 
-## {.center}
+## {.center data-transition="none"}
 
 <h2 style="font-size: 1.6em;">But how does an app scale on traces?</h2>
 
@@ -650,7 +650,7 @@ Let the question land. The audience has seen how votes become telemetry. But Fla
 
 <h2 style="font-size: 1.6em; margin-bottom: 1em;">But how does an app scale on traces?</h2>
 
-<p style="font-size: 1.3em;">I thought Flagger uses Prometheus.</p>
+<p style="font-size: 1.3em;">I thought Flagger uses Prometheus metrics to know when to scale.</p>
 
 ::: {.notes}
 The audience should be wondering this. Flagger uses PromQL queries against Prometheus metrics. But everything we've shown so far is traces and span events. This tension is exactly what Scene 4 resolves.
@@ -658,46 +658,50 @@ The audience should be wondering this. Flagger uses PromQL queries against Prome
 
 ## {.spaced .center}
 
-To turn trace data into metric data, we need two things:
+To turn **trace data** into **metric data**, we need two things:
+
+::: {.notes}
+Set the context. The audience knows how votes become telemetry (Scene 3). Now they need to understand the two transformations required.
+:::
+
+## {.spaced .center data-transition="none"}
+
+To turn **trace data** into **metric data**, we need two things:
+
+1. Make our nested span event **accessible at the span level**
+
+::: {.notes}
+First goal: the vote data is trapped inside a span event. We need to surface it to the span level so downstream processors can read it.
+:::
+
+## {.spaced .center data-transition="none"}
+
+To turn **trace data** into **metric data**, we need two things:
 
 1. Make our nested span event **accessible at the span level**
 
 2. Turn span data into **Prometheus metrics**
 
 ::: {.notes}
-Set the context. The audience knows how votes become telemetry (Scene 3). Now they need to understand the two transformations required before Flagger can use this data.
+Second goal: once the data is on the span, we need to convert those spans into counter metrics that Prometheus can scrape and Flagger can query.
+:::
+
+## {.center}
+
+<h2 style="font-size: 1.6em;">The OpenTelemetry Collector</h2>
+
+::: {.notes}
+Introduce the collector concept. The audience hasn't seen it explained yet.
 :::
 
 ## {.center data-transition="none"}
 
-<h2 style="font-size: 1.6em;">The OTel Collector</h2>
+<h2 style="font-size: 1.6em; margin-bottom: 1em;">The OpenTelemetry Collector</h2>
 
 <p style="font-size: 1.2em;">A pipeline that receives, processes, and exports telemetry</p>
 
 ::: {.notes}
-Introduce the collector. It sits between the apps and the backends. It has a large ecosystem of community-supported processors.
-:::
-
-## {.center data-transition="none"}
-
-<p style="font-size: 1.2em;">**Processors** are pluggable components that transform telemetry as it flows through the collector</p>
-
-<p style="font-size: 0.9em; margin-top: 0.8em;">filter, batch, transform, tail sampling, redaction, k8s attributes, ...</p>
-
-::: {.notes}
-The collector has a large ecosystem of community-supported processors. Examples: filter (drop unwanted data), batch (group for efficiency), transform (modify attributes), tail sampling (sample based on trace outcome), redaction (strip sensitive data), k8s attributes (enrich with pod/node info). You compose them into pipelines.
-:::
-
-## {.spaced .center data-transition="none"}
-
-We will use two **processors**:
-
-1. **Transform Processor** — make span event data accessible at the span level
-
-2. **Spanmetrics Processor** — turn spans into a counter metric Prometheus can understand
-
-::: {.notes}
-Preview the two steps before diving into each one. The audience knows what's coming.
+It sits between the apps and the backends (Prometheus, Datadog). Data flows in, gets transformed, and flows out.
 :::
 
 ## The Collector Pipeline {data-transition="none"}
@@ -705,7 +709,91 @@ Preview the two steps before diving into each one. The audience knows what's com
 ```{mermaid}
 %%| fig-width: 10
 graph LR
-  apps["Apps"] -->|"OTLP"| transform
+  apps["Server"] -->|"spans, events, spanContext"| collector
+  subgraph collector ["OTel Collector"]
+    empty[" "]
+  end
+  style empty fill:none,stroke:none
+  style collector fill:none,stroke:#00897B,stroke-width:2px
+```
+
+::: {.notes}
+Show the basic collector pipeline. Apps send traces via OTLP. The collector is a black box for now.
+:::
+
+## {.spaced .center}
+
+So what mechanism does the collector use to help us with our two goals?
+
+::: {.notes}
+Rhetorical question. Let it hang.
+:::
+
+## {.center}
+
+<p style="font-size: 2.5em; font-weight: bold;">Processors</p>
+
+::: {.notes}
+One word. Let it land.
+:::
+
+## {.center data-transition="none"}
+
+<p style="font-size: 1.2em;">**Processors** are pluggable components that transform telemetry as it flows through the collector</p>
+
+::: {.notes}
+Define what a processor is. Then show examples.
+:::
+
+## {.spaced data-transition="none"}
+
+Community-supported processors include:
+
+::: {.fragment}
+- **Filter** out high-churn, noisy telemetry data
+:::
+
+::: {.fragment}
+- **Batch** spans together for efficient export
+:::
+
+::: {.fragment}
+- **Redact** sensitive fields before export
+:::
+
+::: {.fragment}
+- **Enrich** spans with Kubernetes pod and node metadata
+:::
+
+::: {.notes}
+The collector ecosystem has many processors. These are just a few examples. The point is: you compose them into pipelines to shape your telemetry however you need. We're going to use two specific ones.
+:::
+
+## The Collector Pipeline {data-transition="none"}
+
+```{mermaid}
+%%| fig-width: 10
+graph LR
+  apps["Server"] -->|"spans, events, spanContext"| collector
+  subgraph collector ["OTel Collector"]
+    empty[" "]
+  end
+  style empty fill:none,stroke:none
+  style collector fill:none,stroke:#00897B,stroke-width:2px
+```
+
+We will use two **processors**
+
+::: {.notes}
+Empty collector with the setup line. The audience sees the collector and hears "two processors."
+:::
+
+## The Collector Pipeline {data-transition="none"}
+
+```{mermaid}
+%%| fig-width: 10
+graph LR
+  apps["Server"] -->|"spans, events, spanContext"| collector
   subgraph collector ["OTel Collector"]
     transform["Transform"]
   end
@@ -713,39 +801,10 @@ graph LR
   style collector fill:none,stroke:#00897B,stroke-width:2px
 ```
 
-**Step 1**: Make span event data accessible at the span level
+**Transform Processor** — make span event data accessible at the span level
 
 ::: {.notes}
-The vote data lives on a span event, nested inside the span. But the next processor (spanmetrics) only reads span-level attributes. So we need to "promote" the data up first. This is the transform processor's job.
-:::
-
-## The Collector Pipeline {data-transition="none"}
-
-```{.yaml code-line-numbers="|3-4|5-8"}
-processors:
-  transform:
-    trace_statements:
-      - context: spanevent
-        statements:
-          - set(span.attributes["score.label"],
-                attributes["score.label"])
-            where name == "gen_ai.evaluation.result"
-```
-
-The **transform** processor promotes event attributes up to the span
-
-::: {.notes}
-Show the actual YAML from the collector config. The spanevent context lets us read event attributes and write them to span.attributes. Walk through it: context is spanevent, we read the attribute, write it to the parent span, but only for our specific event name. Without this, spanmetrics would have no idea what the votes were.
-:::
-
-## {.center data-transition="none"}
-
-<p style="font-size: 1.3em; margin-bottom: 1em;">Now the vote data is on the span itself</p>
-
-<p style="font-size: 1.3em;">**Step 2**: Turn spans into metrics</p>
-
-::: {.notes}
-Transition between the two steps. The transform processor solved step 1. Now spanmetrics takes over for step 2.
+The Transform processor promotes span event attributes up to the parent span so downstream processors can read them.
 :::
 
 ## The Collector Pipeline {data-transition="none"}
@@ -753,7 +812,7 @@ Transition between the two steps. The transform processor solved step 1. Now spa
 ```{mermaid}
 %%| fig-width: 10
 graph LR
-  apps["Apps"] -->|"OTLP"| transform
+  apps["Server"] -->|"spans, events, spanContext"| collector
   subgraph collector ["OTel Collector"]
     transform["Transform"] --> spanmetrics["Spanmetrics"]
   end
@@ -762,7 +821,7 @@ graph LR
   style collector fill:none,stroke:#00897B,stroke-width:2px
 ```
 
-The **spanmetrics** connector turns spans into a counter metric
+**Spanmetrics Processor** — turn spans into a counter metric Prometheus can understand
 
 ::: {.notes}
 The spanmetrics connector reads the promoted attributes on each span and produces a counter metric called gen_ai_calls_total. Dimensions include service_name (which variant), score.label (thumbs_up or thumbs_down), and story.part (1-5). This is the bridge from traces to metrics.
@@ -773,21 +832,21 @@ The spanmetrics connector reads the promoted attributes on each span and produce
 ```{mermaid}
 %%| fig-width: 10
 graph LR
-  apps["Apps"] -->|"OTLP"| transform
+  apps["Server"] -->|"spans, events, spanContext"| collector
   subgraph collector ["OTel Collector"]
     transform["Transform"] --> spanmetrics["Spanmetrics"]
   end
-  spanmetrics --> prometheus["Prometheus"]
-  spanmetrics --> datadog["Datadog"]
+  collector --> prometheus["Prometheus"]
   style transform fill:#e8f5f3,stroke:#00897B
   style spanmetrics fill:#e8f5f3,stroke:#00897B
   style collector fill:none,stroke:#00897B,stroke-width:2px
   style prometheus fill:#e0f2f1,stroke:#4DB6AC
-  style datadog fill:#e0f2f1,stroke:#4DB6AC
 ```
 
+We can now send metrics to **Prometheus**
+
 ::: {.notes}
-Two outputs fork from the same metrics. Prometheus is in-cluster — Flagger queries it for canary decisions. Datadog is external — the dashboard you saw during the demo. Same data, two purposes. This decouples the in-cluster rollout decision from the visualization layer.
+First output: Prometheus. In-cluster metrics store.
 :::
 
 ## The Collector Pipeline {data-transition="none"}
@@ -795,12 +854,34 @@ Two outputs fork from the same metrics. Prometheus is in-cluster — Flagger que
 ```{mermaid}
 %%| fig-width: 10
 graph LR
-  apps["Apps"] -->|"OTLP"| transform
+  apps["Server"] -->|"spans, events, spanContext"| collector
   subgraph collector ["OTel Collector"]
     transform["Transform"] --> spanmetrics["Spanmetrics"]
   end
-  spanmetrics --> prometheus["Prometheus<br/>(Flagger queries this)"]
-  spanmetrics --> datadog["Datadog<br/>(you saw this)"]
+  collector --> prometheus["Prometheus"]
+  style transform fill:#e8f5f3,stroke:#00897B
+  style spanmetrics fill:#e8f5f3,stroke:#00897B
+  style collector fill:none,stroke:#00897B,stroke-width:2px
+  style prometheus fill:#e0f2f1,stroke:#4DB6AC
+```
+
+**Flagger** queries Prometheus to make rollout decisions
+
+::: {.notes}
+Flagger runs PromQL queries against Prometheus to make canary decisions. This is the in-cluster path.
+:::
+
+## The Collector Pipeline {data-transition="none"}
+
+```{mermaid}
+%%| fig-width: 10
+graph LR
+  apps["Server"] -->|"spans, events, spanContext"| collector
+  subgraph collector ["OTel Collector"]
+    transform["Transform"] --> spanmetrics["Spanmetrics"]
+  end
+  collector --> prometheus["Prometheus"]
+  collector --> datadog["Datadog"]
   style transform fill:#e8f5f3,stroke:#00897B
   style spanmetrics fill:#e8f5f3,stroke:#00897B
   style collector fill:none,stroke:#00897B,stroke-width:2px
@@ -808,10 +889,34 @@ graph LR
   style datadog fill:#e0f2f1,stroke:#4DB6AC
 ```
 
-**Prometheus** for rollout decisions — **Datadog** for dashboards
+We also send data to **Datadog**
 
 ::: {.notes}
-Drive this home: Prometheus is what Flagger reads. Datadog is what you watched during the demo. Same underlying metric, two different consumers. The collector is the single place where traces become metrics and fan out to both.
+Second output: Datadog. The collector also sends data to Datadog via a separate pipeline.
+:::
+
+## The Collector Pipeline {data-transition="none"}
+
+```{mermaid}
+%%| fig-width: 10
+graph LR
+  apps["Server"] -->|"spans, events, spanContext"| collector
+  subgraph collector ["OTel Collector"]
+    transform["Transform"] --> spanmetrics["Spanmetrics"]
+  end
+  collector --> prometheus["Prometheus"]
+  collector --> datadog["Datadog"]
+  style transform fill:#e8f5f3,stroke:#00897B
+  style spanmetrics fill:#e8f5f3,stroke:#00897B
+  style collector fill:none,stroke:#00897B,stroke-width:2px
+  style prometheus fill:#e0f2f1,stroke:#4DB6AC
+  style datadog fill:#e0f2f1,stroke:#4DB6AC
+```
+
+**Datadog** captures data for live dashboards
+
+::: {.notes}
+Datadog receives traces and metrics via separate pipelines (datadog exporter + datadog/connector). The diagram simplifies this. For the audience: one collector, two outputs, two purposes.
 :::
 
 ## Flagger's Canary Logic
