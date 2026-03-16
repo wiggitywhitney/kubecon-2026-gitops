@@ -1,0 +1,105 @@
+/*-- scss:defaults --*/
+
+// Teal/cyan accent palette
+$accent: #00897B;
+$accent-light: #4DB6AC;
+$accent-dark: #00695C;
+
+$link-color: $accent;
+$link-color-hover: $accent-dark;
+
+$body-color: #2d2d2d;
+$headings-color: #1a1a1a;
+
+// Slightly larger base font for readability at conference scale
+$presentation-font-size-root: 40px;
+$presentation-heading-font: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+$presentation-font-family-body: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+// Tighter heading size so titles don't eat slide real estate
+$presentation-h2-font-size: 1.4em;
+
+/*-- scss:rules --*/
+
+// Accent-colored section dividers
+.reveal section.center h1 {
+  color: $accent;
+  border-bottom: 3px solid $accent-light;
+  padding-bottom: 0.3em;
+  display: inline-block;
+}
+
+// Accent for bold text (subtle pop)
+.reveal strong {
+  color: $accent-dark;
+}
+
+// Table header accent
+.reveal table thead th {
+  background-color: $accent;
+  color: white;
+  border-bottom: 2px solid $accent-dark;
+  padding: 0.5em 1em;
+}
+
+// Table cells — more breathing room
+.reveal table tbody td {
+  padding: 0.5em 1em;
+}
+
+// Table rows
+.reveal table tbody tr:nth-child(even) {
+  background-color: rgba($accent-light, 0.08);
+}
+
+// Space before tables
+.reveal table {
+  margin-top: 0.8em;
+}
+
+// Slide number styling
+.reveal .slide-number {
+  color: $accent;
+}
+
+// Speaker notes marker (visible only in speaker view)
+.reveal .notes {
+  border-left: 3px solid $accent-light;
+}
+
+// Spaced-out text slides — fills the full slide height
+.reveal .slides section.spaced p {
+  margin-bottom: 0.8em;
+  font-size: 1.1em;
+  line-height: 1.6;
+}
+
+// Mermaid diagram spacing
+.reveal .cell-output-display {
+  margin-bottom: 0.3em;
+}
+
+// Tighter paragraph spacing on diagram slides
+.reveal .slides section p {
+  margin-top: 0.2em;
+  margin-bottom: 0.2em;
+}
+
+// Title slide centered
+.reveal .slides section#title-slide {
+  text-align: center;
+}
+
+.reveal .slides section#title-slide h1 {
+  text-align: center;
+}
+
+.reveal .slides section#title-slide .subtitle,
+.reveal .slides section#title-slide p.subtitle {
+  text-align: center;
+}
+
+.reveal .slides section#title-slide .author,
+.reveal .slides section#title-slide p.author {
+  text-align: center;
+}
