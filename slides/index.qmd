@@ -807,6 +807,23 @@ graph LR
 The Transform processor promotes span event attributes up to the parent span so downstream processors can read them.
 :::
 
+## The Transform Processor {data-transition="none"}
+
+```{.yaml code-line-numbers="|2-4|5-8"}
+processors:
+  transform:
+    trace_statements:
+      - context: spanevent
+        statements:
+          - set(span.attributes["score.label"],
+                attributes["score.label"])
+            where name == "gen_ai.evaluation.result"
+```
+
+::: {.notes}
+Walk through the real YAML. First highlight: we're in the transform processor, operating in the spanevent context. Second highlight: we read the attribute from the event and write it to the parent span. This runs for every span event named gen_ai.evaluation.result. Same pattern repeats for score.value and story.part.
+:::
+
 ## The Collector Pipeline {data-transition="none"}
 
 ```{mermaid}
@@ -824,7 +841,23 @@ graph LR
 **Spanmetrics Processor** — turn spans into a counter metric Prometheus can understand
 
 ::: {.notes}
-The spanmetrics connector reads the promoted attributes on each span and produces a counter metric called gen_ai_calls_total. Dimensions include service_name (which variant), score.label (thumbs_up or thumbs_down), and story.part (1-5). This is the bridge from traces to metrics.
+The spanmetrics connector reads the promoted attributes on each span and produces a counter metric called gen_ai_calls_total.
+:::
+
+## The Spanmetrics Connector {data-transition="none"}
+
+```{.yaml code-line-numbers="|2-3|4-6|7"}
+connectors:
+  spanmetrics:
+    namespace: gen_ai
+    dimensions:
+      - name: gen_ai.evaluation.score.label
+      - name: story.part
+    metrics_flush_interval: 15s
+```
+
+::: {.notes}
+Walk through the real YAML. First highlight: spanmetrics connector with namespace gen_ai (produces metric gen_ai_calls_total). Second highlight: dimensions — these are the promoted attributes from the transform step. Third highlight: flush every 15 seconds. The result is a counter metric with dimensions for service_name, score.label, and story.part.
 :::
 
 ## The Collector Pipeline {data-transition="none"}
