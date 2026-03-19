@@ -6,7 +6,7 @@ metadata:
   namespace: observability
 spec:
   mode: deployment
-  image: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.145.0
+  image: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.146.0
   env:
     - name: DD_API_KEY
       valueFrom:
@@ -52,7 +52,8 @@ spec:
             buckets: [1]
         dimensions:
           - name: gen_ai.evaluation.score.label   # promoted from event → span attribute
-          - name: story.part                       # story part number (1-5)
+          - name: story.name                      # story name
+          - name: story.part                      # story part number (1-5)
         metrics_flush_interval: 15s
 
     exporters:
@@ -84,6 +85,9 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: otel-collector
+    matchExpressions:
+      - key: operator.opentelemetry.io/collector-headless-service
+        operator: DoesNotExist
   endpoints:
     - port: prometheus
       interval: 3s

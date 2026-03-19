@@ -5,6 +5,8 @@ metadata:
   name: apps-platform
   namespace: kadras-system
 spec:
+  dependsOn:
+    - name: database
   interval: 1m
   retryInterval: 15s
   timeout: 5m

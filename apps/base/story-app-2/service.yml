@@ -2,7 +2,7 @@
 apiVersion: serving.knative.dev/v1
 kind: Service
 metadata:
-  name: story-app-1
+  name: story-app-2
 spec:
   template:
     metadata:
@@ -19,11 +19,11 @@ spec:
             - containerPort: 8080
           env:
             - name: STORY_THEME
-              value: "MOON"
+              value: "CIRCUS"
             - name: STORY_STYLE
-              value: "DRY" # DRY or FUNNY
+              value: "FUNNY"
             - name: STORY_MODEL
-              value: "SMALL"
+              value: "SMALL" # SMALL or LARGE
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
               value: "http://otel-collector.observability.svc.cluster.local:4318"
             - name: OTEL_LOGS_EXPORTER

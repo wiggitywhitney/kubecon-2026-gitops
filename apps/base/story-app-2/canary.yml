@@ -2,13 +2,13 @@
 apiVersion: flagger.app/v1beta1
 kind: Canary
 metadata:
-  name: story-app-1
+  name: story-app-2
 spec:
   provider: knative
   targetRef:
     apiVersion: serving.knative.dev/v1
     kind: Service
-    name: story-app-1
+    name: story-app-2
   progressDeadlineSeconds: 3600
   analysis:
     interval: 10s       # check every 10 s — progression visible on screen
@@ -16,9 +16,9 @@ spec:
     stepWeight: 10      # +10% per successful check; full rollout ≈ 100 s
     maxWeight: 100
     metrics:
-      - name: satisfaction-score-rate-1
+      - name: satisfaction-score-rate-2
         templateRef:
-          name: satisfaction-score-rate-1
+          name: satisfaction-score-rate-2
           namespace: apps
         thresholdRange:
           min: 5        # canary must be ≥5pp better than primary to advance

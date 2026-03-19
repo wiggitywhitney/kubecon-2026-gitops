@@ -4,4 +4,4 @@ kind: Kustomization
 namespace: apps
 
 resources:
-- ../../base/hello
+- ../../base/story-app-2

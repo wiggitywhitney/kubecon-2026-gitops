@@ -2,7 +2,7 @@
 apiVersion: flagger.app/v1beta1
 kind: MetricTemplate
 metadata:
-  name: satisfaction-score-rate-1
+  name: satisfaction-score-rate-2
 spec:
   provider:
     type: prometheus
@@ -11,24 +11,24 @@ spec:
     (
       sum(rate(gen_ai_calls_total{
         span_name="evaluate UserSatisfaction",
-        story_name="story-app-1b",
+        story_name="story-app-2b",
         gen_ai_evaluation_score_label="thumbs_up"
       }[{{ interval }}]))
       /
       (sum(rate(gen_ai_calls_total{
         span_name="evaluate UserSatisfaction",
-        story_name="story-app-1b"
+        story_name="story-app-2b"
       }[{{ interval }}])) > 0)
       -
       sum(rate(gen_ai_calls_total{
         span_name="evaluate UserSatisfaction",
-        story_name="story-app-1a",
+        story_name="story-app-2a",
         gen_ai_evaluation_score_label="thumbs_up"
       }[{{ interval }}]))
       /
       (sum(rate(gen_ai_calls_total{
         span_name="evaluate UserSatisfaction",
-        story_name="story-app-1a"
+        story_name="story-app-2a"
       }[{{ interval }}])) > 0)
     ) * 100
     or on() vector(5)
