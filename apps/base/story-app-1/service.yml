@@ -50,6 +50,16 @@ spec:
                 secretKeyRef:
                   name: postgresql-story-app
                   key: password
+            - name: SPRING_SECURITY_USER_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: admin-credentials
+                  key: username
+            - name: SPRING_SECURITY_USER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: admin-credentials
+                  key: password
           livenessProbe:
             successThreshold: 1
             failureThreshold: 3
