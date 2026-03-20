@@ -21,6 +21,13 @@ spec:
             endpoint: 0.0.0.0:4317
           http:
             endpoint: 0.0.0.0:4318
+      prometheus:
+        config:
+          scrape_configs:
+            - job_name: flagger
+              scrape_interval: 10s
+              static_configs:
+                - targets: [flagger.flagger-system:8080]
 
     processors:
       transform:
@@ -71,7 +78,7 @@ spec:
           processors: [transform, batch]
           exporters: [spanmetrics, datadog/connector, datadog]
         metrics:
-          receivers: [spanmetrics, datadog/connector, otlp]
+          receivers: [spanmetrics, datadog/connector, otlp, prometheus]
           processors: [batch]
           exporters: [prometheus, datadog]
 
