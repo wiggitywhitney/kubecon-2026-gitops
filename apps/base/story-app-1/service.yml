@@ -21,7 +21,7 @@ spec:
             - name: STORY_THEME
               value: "MOON"
             - name: STORY_STYLE
-              value: "FUNNY" # DRY or FUNNY
+              value: "DRY" # DRY or FUNNY
             - name: STORY_MODEL
               value: "SMALL"
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
