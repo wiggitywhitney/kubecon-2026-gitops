@@ -43,3 +43,6 @@ spec:
       kubernetes.io/os: linux
     meshProvider: knative
     metricsServer: http://prometheus-prometheus.observability:9090
+  serviceMonitor:
+    enabled: true
+    honorLabels: true

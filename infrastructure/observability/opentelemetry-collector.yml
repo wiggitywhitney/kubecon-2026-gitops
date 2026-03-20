@@ -71,7 +71,7 @@ spec:
           processors: [transform, batch]
           exporters: [spanmetrics, datadog/connector, datadog]
         metrics:
-          receivers: [spanmetrics, datadog/connector]
+          receivers: [spanmetrics, datadog/connector, otlp]
           processors: [batch]
           exporters: [prometheus, datadog]
 
