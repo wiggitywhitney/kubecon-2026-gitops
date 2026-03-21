@@ -185,6 +185,11 @@ spec:
                       MOON-B: "LARGE"
                       CIRCUS-A: "SMALL"
                       CIRCUS-B: "LARGE"
+            readinessChecks:
+              - type: MatchCondition
+                matchCondition:
+                  type: Ready
+                  status: "True"
 
           # ── 2. Flagger Canary ───────────────────────────────────────────────
           - name: canary
