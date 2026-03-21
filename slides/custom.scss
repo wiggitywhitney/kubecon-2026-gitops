@@ -74,6 +74,13 @@ $presentation-h2-font-size: 1.4em;
   line-height: 1.6;
 }
 
+// Center images on .center slides
+.reveal .slides section.center p img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 // Mermaid diagram spacing
 .reveal .cell-output-display {
   margin-bottom: 0.3em;

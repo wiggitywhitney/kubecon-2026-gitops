@@ -221,7 +221,7 @@ There were **two versions** of that story.
 | | Variant A | Variant B |
 |---|---|---|
 | **Tone** | Dry, matter-of-fact | Funny, playful |
-| **Model** | Sonnet 4 | Sonnet 4 |
+| **Model** | Mistral Medium | Mistral Medium |
 
 ::: {.notes}
 The big reveal. The audience didn't know there were two variants. Now show the Datadog dashboard — the funnier variant should have higher satisfaction. Point out that the system was already shifting traffic toward the winner while they were voting.
@@ -952,20 +952,144 @@ graph LR
 Datadog receives traces and metrics via separate pipelines (datadog exporter + datadog/connector). The diagram simplifies this. For the audience: one collector, two outputs, two purposes.
 :::
 
-## Flagger's Canary Logic
+# The Platform {.center data-transition="none"}
 
-<!-- TODO (M6): Incremental Flagger decision loop diagram -->
-<!-- Build 1: Prometheus scrapes gen_ai_calls_total every 3s -->
-<!-- Build 2: Flagger runs PromQL: (B thumbs_up %) - (A thumbs_up %) -->
-<!-- Build 3: Delta >= 5pp for 3 consecutive checks → advance traffic weight by 10% -->
-<!-- Build 4: Traffic split progression: 90/10 → 80/20 → ... → 0/100 -->
-<!-- Build 5: Delta drops below threshold → rollback to 100% A -->
+<span style="position: absolute; bottom: 20px; right: 40px; font-size: 4em; opacity: 0.8;">🌊</span>
 
 ::: {.notes}
-Scene 5: The Decision — Flagger's Canary Logic.
-Show how metrics drive automated rollout decisions. Key teaching point: threshold is relative (B must be 5 percentage points better than A), not absolute. The system promotes the variant that makes users happier.
-Incremental build: (1) Prometheus scrapes collector, (2) Flagger runs PromQL query, (3) threshold check, (4) traffic split progression, (5) rollback if delta drops.
+Section divider: The Platform. The cloud native platform that makes the feedback loop possible — Knative Serving, Flagger, and Crossplane.
 :::
+
+## Cloud Native Platform  {.center data-transition="none"}
+
+![](images/thomas/platform-1.png){.r-stretch}
+
+## Cloud Native Platform  {.center data-transition="none"}
+
+![](images/thomas/platform-2.png){.r-stretch}
+
+## Cloud Native Platform  {.center data-transition="none"}
+
+![](images/thomas/platform-3.png){.r-stretch}
+
+## Cloud Native Platform  {.center data-transition="none"}
+
+![](images/thomas/platform-4.png){.r-stretch}
+
+## Cloud Native Platform  {.center data-transition="none"}
+
+![](images/thomas/platform-5.png){.r-stretch}
+
+## Cloud Native Platform  {.center data-transition="none"}
+
+![](images/thomas/platform-6.png){.r-stretch}
+
+## Cloud Native Platform  {.center data-transition="none"}
+
+![](images/thomas/platform-7.png){.r-stretch}
+
+## Cloud Native Platform  {.center data-transition="none"}
+
+![](images/thomas/platform-8.png){.r-stretch}
+
+## Cloud Native Platform  {.center data-transition="none"}
+
+![](images/thomas/platform-9.png){.r-stretch}
+
+## Platform API {.center data-transition="none"}
+
+```{.yaml code-line-numbers="|1-4|6|7-9"}
+apiVersion: apps.kadras.io/v1alpha1
+kind: StoryApp
+metadata:
+  name: story-app
+spec:
+  image: ghcr.io/thomasvitale/scaling-on-satisfaction
+  story:
+    theme: MOON
+    variant: A
+```
+
+## The Canary {.center data-transition="none"}
+
+```{.yaml code-line-numbers="|1-4|5-10|11-23"}
+apiVersion: flagger.app/v1beta1
+kind: Canary
+metadata:
+  name: story-app-moon
+spec:
+  provider: knative
+  targetRef:
+    apiVersion: serving.knative.dev/v1
+    kind: Service
+    name: story-app-moon
+  analysis:
+    interval: 30s
+    metrics:
+    - interval: 2m
+      name: satisfaction-score-rate
+      templateRef:
+        name: satisfaction-score-rate
+        namespace: apps
+      thresholdRange:
+        min: 5
+    maxWeight: 100
+    stepWeight: 10
+    threshold: 10
+```
+
+## The MetricTemplate {.center data-transition="none"}
+
+```{.yaml code-line-numbers="|1-4|5-8|9-33"}
+apiVersion: flagger.app/v1beta1
+kind: MetricTemplate
+metadata:
+  name: satisfaction-score-rate
+spec:
+  provider:
+    address: http://prometheus-prometheus.observability:9090
+    type: prometheus
+  query: |
+    (
+      sum(rate(gen_ai_calls_total{
+        span_name="evaluate UserSatisfaction",
+        story_name="story-app-moon-b",
+        gen_ai_evaluation_score_label="thumbs_up"
+      }[{{ interval }}]))
+      /
+      (sum(rate(gen_ai_calls_total{
+        span_name="evaluate UserSatisfaction",
+        story_name="story-app-moon-b"
+      }[{{ interval }}])) > 0)
+      -
+      sum(rate(gen_ai_calls_total{
+        span_name="evaluate UserSatisfaction",
+        story_name="story-app-moon-a",
+        gen_ai_evaluation_score_label="thumbs_up"
+      }[{{ interval }}]))
+      /
+      (sum(rate(gen_ai_calls_total{
+        span_name="evaluate UserSatisfaction",
+        story_name="story-app-moon-a"
+      }[{{ interval }}])) > 0)
+    ) * 100
+    or on() vector(0)
+```
+
+## One Knative Service, Multiple Revisions {.center data-transition="none"}
+
+```{mermaid}
+%%| fig-width: 10
+flowchart LR
+  audience["Audience"] --> ksvc["Knative Service"]
+  ksvc --> ksvc_a["Revision 1"]
+  ksvc --> ksvc_b["Revision 2"]
+  ksvc --> ksvc_c["Revision 3"]
+  style ksvc fill:#e3f2fd,stroke:#1565C0
+  style ksvc_a fill:#e8f5f3,stroke:#00897B
+  style ksvc_b fill:#e8f5f3,stroke:#00897B
+  style ksvc_c fill:#e8f5f3,stroke:#00897B
+```
 
 # Live Demo {.center}
 
@@ -973,19 +1097,7 @@ Incremental build: (1) Prometheus scrapes collector, (2) Flagger runs PromQL que
 Section divider: Round 2 Live Demo. Now the audience understands the infrastructure — their votes have new meaning.
 :::
 
-## This Time You Know
-
-Now you understand the feedback loop.
-
-This time: **two different models**, same tone.
-
-One is cheap. One is expensive. Which one do you prefer?
-
-::: {.notes}
-PRESENTER CUE: The audience now understands the infrastructure from the teaching scenes. Frame this round differently — they know their votes control the rollout. The tension is real: does the expensive model actually produce better stories? Variants: 2a (Haiku 4.5, cheap) vs 2b (Opus 4.6, expensive), same tone. The outcome is genuinely unknown.
-:::
-
-## Time to Vote — Again! {.center}
+## Time to Vote. Again! {.center}
 
 ### Scan the QR code
 
@@ -1008,7 +1120,7 @@ PRESENTER CUE: Click the link to open the Datadog dashboard in TV mode. This tim
 | | Variant A | Variant B |
 |---|---|---|
 | **Tone** | Same | Same |
-| **Model** | Haiku 4.5 (cheap) | Opus 4.6 (expensive) |
+| **Model** | Mistral Medium (cheap) | Opus 4.6 (expensive) |
 
 ::: {.notes}
 Reveal the model difference. Show the Datadog dashboard results. The expensive model might not have won — that's the point.
@@ -1053,6 +1165,12 @@ Show the complete cycle — audience votes are literally controlling the infrast
 
 ::: {.notes}
 Wrap-up slide. Recap the key technologies and the audience's role. Emphasize: this isn't hypothetical — they just did it, live.
+:::
+
+## {background-image="images/thomas/thomas-vitale.png" background-size="contain" background-color="white"}
+
+::: {.notes}
+Thomas Vitale — software engineer at Systematic, author of Cloud Native Spring in Action (Manning). Arconia maintainer, Java Champion, CNCF Ambassador, Spring AI and Testcontainers contributor.
 :::
 
 ## Thank You
