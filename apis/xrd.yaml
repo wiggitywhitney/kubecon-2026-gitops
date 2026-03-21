@@ -45,3 +45,12 @@ spec:
               required:
                 - image
                 - story
+            status:
+              type: object
+              properties:
+                image:
+                  description: The OCI container image currently running in the Knative Service.
+                  type: string
+                url:
+                  description: The public URL of the Knative Service.
+                  type: string

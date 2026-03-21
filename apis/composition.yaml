@@ -117,6 +117,11 @@ spec:
                           seccompProfile:
                             type: RuntimeDefault
             patches:
+              # Set the Knative Service name to the XR name (no random suffix)
+              - type: FromCompositeFieldPath
+                fromFieldPath: metadata.name
+                toFieldPath: metadata.name
+
               # Set the container image from spec.image
               - type: FromCompositeFieldPath
                 fromFieldPath: spec.image
@@ -148,6 +153,16 @@ spec:
                       MOON-B: "FUNNY"
                       CIRCUS-A: "FUNNY"
                       CIRCUS-B: "FUNNY"
+
+              # Write the running image back to XR status.image
+              - type: ToCompositeFieldPath
+                fromFieldPath: spec.template.spec.containers[0].image
+                toFieldPath: status.image
+
+              # Write the public Knative Service URL back to XR status.url
+              - type: ToCompositeFieldPath
+                fromFieldPath: status.url
+                toFieldPath: status.url
 
               # Set STORY_MODEL by combining theme+variant into a key and mapping:
               #   MOON+A  -> LARGE  (MOON always uses LARGE model)
