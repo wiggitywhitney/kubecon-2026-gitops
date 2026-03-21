@@ -10,7 +10,15 @@ In this session, Whitney and Thomas demo a platform that enables app developers 
 
 You’ll see how this technique can be applied beyond GenAI, and take part in an interactive story that evolves and changes course in real time based on your feedback!
 
-Example repository for GitOps with FluxCD used in the [Kadras Engineering Platform](https://kadras.io).
+## Development environment
+
+This project uses [Flox](https://flox.dev/) to manage the development and build environment via [Nix](https://nixos.org). After [installing](https://flox.dev/docs/install-flox/install/) the Flox CLI (open-source), activate the environment:
+
+```shell
+flox activate
+```
+
+By doing so, you will have access to all the tools and dependencies needed to provision a Kubernetes cluster, install the Kadras Engineering Platform, and deploy the applications.
 
 ## Platform
 

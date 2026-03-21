@@ -1,0 +1,32 @@
+schema-version = "1.10.0"
+
+[install]
+kapp.pkg-path = "kapp"
+ytt.pkg-path = "ytt"
+kbld.pkg-path = "kbld"
+imgpkg.pkg-path = "imgpkg"
+vendir.pkg-path = "vendir"
+kubectl.pkg-path = "kubectl"
+kubectl.outputs = "all"
+kubernetes-helm.pkg-path = "kubernetes-helm"
+jq.pkg-path = "jq"
+jq.outputs = "all"
+yq.pkg-path = "yq"
+yq.outputs = "all"
+k3d.pkg-path = "k3d"
+
+[vars]
+FLOX_DISABLE_METRICS = "true"
+
+[hook]
+
+[profile]
+
+[services]
+
+[include]
+
+[build]
+
+[options]
+systems = ["aarch64-darwin", "aarch64-linux", "x86_64-darwin", "x86_64-linux"]
