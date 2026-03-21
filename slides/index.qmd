@@ -1010,6 +1010,10 @@ spec:
     variant: A
 ```
 
+## Platform API  {.center data-transition="none"}
+
+![](images/thomas/dev-story-app.png){.r-stretch}
+
 ## The Canary {.center data-transition="none"}
 
 ```{.yaml code-line-numbers="|1-4|5-10|11-23"}
