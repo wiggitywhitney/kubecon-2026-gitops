@@ -216,6 +216,11 @@ spec:
                         min: 5
                       interval: 2m
             patches:
+              # Set the Canary name to the XR name (no random suffix)
+              - type: FromCompositeFieldPath
+                fromFieldPath: metadata.name
+                toFieldPath: metadata.name
+
               # targetRef.name points to the Knative Service — same as XR name
               - type: FromCompositeFieldPath
                 fromFieldPath: metadata.name
