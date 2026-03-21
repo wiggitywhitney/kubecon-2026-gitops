@@ -1,0 +1,287 @@
+---
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: storyapp
+spec:
+  compositeTypeRef:
+    apiVersion: apps.kadras.io/v1alpha1
+    kind: StoryApp
+  mode: Pipeline
+  pipeline:
+    - step: create-knative-service-canary-and-metrics
+      functionRef:
+        name: function-patch-and-transform
+      input:
+        apiVersion: pt.fn.crossplane.io/v1beta1
+        kind: Resources
+        resources:
+
+          # ── 1. Knative Service ──────────────────────────────────────────────
+          - name: knative-service
+            base:
+              apiVersion: serving.knative.dev/v1
+              kind: Service
+              spec:
+                template:
+                  metadata:
+                    annotations:
+                      autoscaling.knative.dev/min-scale: "1"
+                  spec:
+                    automountServiceAccountToken: false
+                    serviceAccountName: supply-chain
+                    containers:
+                      - name: workload
+                        imagePullPolicy: Always
+                        ports:
+                          - containerPort: 8080
+                        env:
+                          # index 0 - patched from spec.story.theme
+                          - name: STORY_THEME
+                            value: ""
+                          # index 1 - patched via theme+variant map transform
+                          - name: STORY_STYLE
+                            value: ""
+                          # index 2 - patched via theme+variant map transform
+                          - name: STORY_MODEL
+                            value: ""
+                          - name: OTEL_EXPORTER_OTLP_ENDPOINT
+                            value: "http://otel-collector.observability.svc.cluster.local:4318"
+                          - name: OTEL_LOGS_EXPORTER
+                            value: "none"
+                          - name: OTEL_METRICS_EXPORTER
+                            value: "none"
+                          - name: MISTRAL_AI_API_KEY
+                            valueFrom:
+                              secretKeyRef:
+                                name: mistral-ai
+                                key: api-key
+                          - name: SPRING_DATASOURCE_URL
+                            valueFrom:
+                              secretKeyRef:
+                                name: postgresql-story-app
+                                key: jdbc-uri
+                          - name: SPRING_DATASOURCE_USERNAME
+                            valueFrom:
+                              secretKeyRef:
+                                name: postgresql-story-app
+                                key: username
+                          - name: SPRING_DATASOURCE_PASSWORD
+                            valueFrom:
+                              secretKeyRef:
+                                name: postgresql-story-app
+                                key: password
+                          - name: SPRING_SECURITY_USER_NAME
+                            valueFrom:
+                              secretKeyRef:
+                                name: admin-credentials
+                                key: username
+                          - name: SPRING_SECURITY_USER_PASSWORD
+                            valueFrom:
+                              secretKeyRef:
+                                name: admin-credentials
+                                key: password
+                        livenessProbe:
+                          successThreshold: 1
+                          failureThreshold: 3
+                          httpGet:
+                            path: /actuator/health/liveness
+                            port: 8080
+                            scheme: HTTP
+                          initialDelaySeconds: 5
+                          periodSeconds: 10
+                          timeoutSeconds: 5
+                        readinessProbe:
+                          successThreshold: 1
+                          failureThreshold: 3
+                          httpGet:
+                            path: /actuator/health/readiness
+                            port: 8080
+                            scheme: HTTP
+                          initialDelaySeconds: 5
+                          periodSeconds: 10
+                          timeoutSeconds: 5
+                        resources:
+                          requests:
+                            cpu: 250m
+                            memory: 1Gi
+                          limits:
+                            memory: 1Gi
+                        securityContext:
+                          allowPrivilegeEscalation: false
+                          capabilities:
+                            drop:
+                              - ALL
+                          runAsNonRoot: true
+                          runAsUser: 1001
+                          seccompProfile:
+                            type: RuntimeDefault
+            patches:
+              # Set the container image from spec.image
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.image
+                toFieldPath: spec.template.spec.containers[0].image
+
+              # Set STORY_THEME directly from spec.story.theme
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.story.theme
+                toFieldPath: spec.template.spec.containers[0].env[0].value
+
+              # Set STORY_STYLE by combining theme+variant into a key and mapping:
+              #   MOON+A  -> DRY
+              #   MOON+B  -> FUNNY
+              #   CIRCUS+A -> FUNNY
+              #   CIRCUS+B -> FUNNY
+              - type: CombineFromComposite
+                combine:
+                  variables:
+                    - fromFieldPath: spec.story.theme
+                    - fromFieldPath: spec.story.variant
+                  strategy: string
+                  string:
+                    fmt: "%s-%s"
+                toFieldPath: spec.template.spec.containers[0].env[1].value
+                transforms:
+                  - type: map
+                    map:
+                      MOON-A: "DRY"
+                      MOON-B: "FUNNY"
+                      CIRCUS-A: "FUNNY"
+                      CIRCUS-B: "FUNNY"
+
+              # Set STORY_MODEL by combining theme+variant into a key and mapping:
+              #   MOON+A  -> LARGE  (MOON always uses LARGE model)
+              #   MOON+B  -> LARGE  (MOON always uses LARGE model)
+              #   CIRCUS+A -> SMALL
+              #   CIRCUS+B -> LARGE
+              - type: CombineFromComposite
+                combine:
+                  variables:
+                    - fromFieldPath: spec.story.theme
+                    - fromFieldPath: spec.story.variant
+                  strategy: string
+                  string:
+                    fmt: "%s-%s"
+                toFieldPath: spec.template.spec.containers[0].env[2].value
+                transforms:
+                  - type: map
+                    map:
+                      MOON-A: "LARGE"
+                      MOON-B: "LARGE"
+                      CIRCUS-A: "SMALL"
+                      CIRCUS-B: "LARGE"
+
+          # ── 2. Flagger Canary ───────────────────────────────────────────────
+          - name: canary
+            base:
+              apiVersion: flagger.app/v1beta1
+              kind: Canary
+              spec:
+                provider: knative
+                targetRef:
+                  apiVersion: serving.knative.dev/v1
+                  kind: Service
+                  name: ""
+                progressDeadlineSeconds: 3600
+                analysis:
+                  interval: 30s
+                  threshold: 10
+                  stepWeights: [20, 30, 40, 50, 60, 70, 80, 90, 100]
+                  metrics:
+                    - name: ""
+                      templateRef:
+                        name: ""
+                        namespace: ""
+                      thresholdRange:
+                        min: 5
+                      interval: 2m
+            patches:
+              # targetRef.name points to the Knative Service — same as XR name
+              - type: FromCompositeFieldPath
+                fromFieldPath: metadata.name
+                toFieldPath: spec.targetRef.name
+
+              # metric name = "satisfaction-score-rate-{xr-name}"
+              - type: FromCompositeFieldPath
+                fromFieldPath: metadata.name
+                toFieldPath: spec.analysis.metrics[0].name
+                transforms:
+                  - type: string
+                    string:
+                      type: Format
+                      fmt: "satisfaction-score-rate-%s"
+
+              # templateRef.name = "satisfaction-score-rate-{xr-name}"
+              - type: FromCompositeFieldPath
+                fromFieldPath: metadata.name
+                toFieldPath: spec.analysis.metrics[0].templateRef.name
+                transforms:
+                  - type: string
+                    string:
+                      type: Format
+                      fmt: "satisfaction-score-rate-%s"
+
+              # templateRef.namespace = namespace where the MetricTemplate lives
+              - type: FromCompositeFieldPath
+                fromFieldPath: metadata.namespace
+                toFieldPath: spec.analysis.metrics[0].templateRef.namespace
+
+          # ── 3. Flagger MetricTemplate ───────────────────────────────────────
+          - name: metric-template
+            base:
+              apiVersion: flagger.app/v1beta1
+              kind: MetricTemplate
+              spec:
+                provider:
+                  type: prometheus
+                  address: http://prometheus-prometheus.observability:9090
+                query: ""
+            patches:
+              # metadata.name = "satisfaction-score-rate-{xr-name}"
+              - type: FromCompositeFieldPath
+                fromFieldPath: metadata.name
+                toFieldPath: metadata.name
+                transforms:
+                  - type: string
+                    string:
+                      type: Format
+                      fmt: "satisfaction-score-rate-%s"
+
+              # Build the full PromQL query, embedding {name}b (canary) and
+              # {name}a (primary) via four %s placeholders.
+              # The {{ interval }} placeholder is left intact for Flagger to fill.
+              - type: CombineFromComposite
+                combine:
+                  variables:
+                    - fromFieldPath: metadata.name
+                    - fromFieldPath: metadata.name
+                    - fromFieldPath: metadata.name
+                    - fromFieldPath: metadata.name
+                  strategy: string
+                  string:
+                    fmt: |
+                      (
+                        sum(rate(gen_ai_calls_total{
+                          span_name="evaluate UserSatisfaction",
+                          story_name="%sb",
+                          gen_ai_evaluation_score_label="thumbs_up"
+                        }[{{ interval }}]))
+                        /
+                        (sum(rate(gen_ai_calls_total{
+                          span_name="evaluate UserSatisfaction",
+                          story_name="%sb"
+                        }[{{ interval }}])) > 0)
+                        -
+                        sum(rate(gen_ai_calls_total{
+                          span_name="evaluate UserSatisfaction",
+                          story_name="%sa",
+                          gen_ai_evaluation_score_label="thumbs_up"
+                        }[{{ interval }}]))
+                        /
+                        (sum(rate(gen_ai_calls_total{
+                          span_name="evaluate UserSatisfaction",
+                          story_name="%sa"
+                        }[{{ interval }}])) > 0)
+                      ) * 100
+                      or on() vector(0)
+                toFieldPath: spec.query

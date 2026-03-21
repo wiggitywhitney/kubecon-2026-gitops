@@ -1,0 +1,47 @@
+---
+apiVersion: apiextensions.crossplane.io/v2
+kind: CompositeResourceDefinition
+metadata:
+  name: storyapps.apps.kadras.io
+spec:
+  scope: Namespaced
+  group: apps.kadras.io
+  names:
+    kind: StoryApp
+    plural: storyapps
+  versions:
+    - name: v1alpha1
+      served: true
+      referenceable: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                image:
+                  description: The OCI container image for the story app.
+                  type: string
+                story:
+                  type: object
+                  description: Story configuration for the app.
+                  properties:
+                    theme:
+                      description: The story theme. Either MOON or CIRCUS.
+                      type: string
+                      enum:
+                        - MOON
+                        - CIRCUS
+                    variant:
+                      description: The story variant. Either A or B.
+                      type: string
+                      enum:
+                        - A
+                        - B
+                  required:
+                    - theme
+                    - variant
+              required:
+                - image
+                - story
