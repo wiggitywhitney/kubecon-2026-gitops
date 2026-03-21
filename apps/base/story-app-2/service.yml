@@ -23,7 +23,7 @@ spec:
             - name: STORY_STYLE
               value: "FUNNY"
             - name: STORY_MODEL
-              value: "SMALL" # SMALL or LARGE
+              value: "LARGE" # SMALL or LARGE
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
               value: "http://otel-collector.observability.svc.cluster.local:4318"
             - name: OTEL_LOGS_EXPORTER
