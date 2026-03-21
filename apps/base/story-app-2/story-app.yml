@@ -4,7 +4,7 @@ kind: StoryApp
 metadata:
   name: story-app-2
 spec:
-  image: ghcr.io/thomasvitale/scaling-on-satisfaction:fe75708ff2f234ddebed32237d73c8d473ffae7c
+  image: ghcr.io/thomasvitale/scaling-on-satisfaction:9de69a19b0dd170f7e9ae79a792b77e93ab90a53
   story:
     theme: CIRCUS
     variant: A
