@@ -247,73 +247,6 @@ The platform uses those metrics to **roll out the more popular variant**
 The platform shifts traffic toward whichever variant has higher satisfaction. This is the feedback loop — audience votes become telemetry, telemetry becomes metrics, metrics drive the rollout, and the audience gets more of the variant they prefer. We'll dig into each of these steps after Round 1.
 :::
 
-# Live Demo {.center}
-
-<img src="images/Flat_Zigzag_Yellow_Pink.png" width="200" style="position: absolute; top: -40px; right: -30px; transform: rotate(0deg); opacity: 0.7;">
-
-::: {.notes}
-Section divider: Round 1 Live Demo. Audience experiences the app for the first time.
-:::
-
-## Let's Try It
-
-You're about to read a short AI-generated story.
-
-After each part, vote: **thumbs up** or **thumbs down**.
-
-That's it. Just read and react.
-
-<img src="images/Black_Line_Yellow_Bulb.png" width="300" style="position: absolute; bottom: -50px; right: -30px; transform: rotate(-6deg);">
-
-::: {.notes}
-PRESENTER CUE: Keep this simple — don't reveal that there are two variants or what the difference is. The audience should just experience the app naturally. Switch to the Datadog dashboard on screen, THEN reveal the URL. The reveal of dry vs funny comes AFTER voting, in the debrief slide.
-:::
-
-## Time to Vote! {.center}
-
-### Scan the QR code
-
-Read each story part. Vote thumbs up or thumbs down.
-
-::: {.notes}
-PRESENTER CUE: Open the app in Chrome on your laptop, right-click, "Create QR code for this page", project it. Advance story parts from the admin panel as votes come in. Let 2-3 story parts play out (~3-4 minutes). When ready, click through to the dashboard slide.
-:::
-
-## [Live Dashboard](https://app.datadoghq.com/dashboard/68y-xeg-j6s?tv_mode=true) {.center}
-
-Watch the votes come in:
-
-**[Open Datadog Dashboard](https://app.datadoghq.com/dashboard/68y-xeg-j6s?tv_mode=true)**
-
-::: {.notes}
-PRESENTER CUE: Click the link to open the Datadog dashboard in TV mode. This shows votes per variant and satisfaction rates updating in real time. Stay on this while the audience votes. The dashboard URL is: https://app.datadoghq.com/dashboard/68y-xeg-j6s?tv_mode=true
-:::
-
-## The Reveal
-
-There were **two versions** of that story.
-
-| | Variant A | Variant B |
-|---|---|---|
-| **Tone** | Dry, matter-of-fact | Funny, playful |
-| **Model** | Mistral Medium | Mistral Medium |
-
-::: {.notes}
-The big reveal. The audience didn't know there were two variants. Now show the Datadog dashboard — the funnier variant should have higher satisfaction. Point out that the system was already shifting traffic toward the winner while they were voting.
-:::
-
-## {.center data-transition="none"}
-
-<h2 style="font-size: 1.6em; margin-bottom: 1em;">What Just Happened?</h2>
-
-<p style="font-size: 1.3em; margin-bottom: 1.2em;">The platform **shifted traffic** toward the variant you liked more.</p>
-
-<p style="font-size: 1.3em;">Now let's look at exactly how.</p>
-
-::: {.notes}
-Transition to teaching scenes. The audience saw the feedback loop diagram in Scene 2, but now we'll dig into each component: how votes become telemetry, how the collector turns telemetry into metrics, and how Flagger uses those metrics to shift traffic.
-:::
-
 # How It Works {.center}
 
 <img src="images/Isometric_Grid_Green_Pink.png" width="250" style="position: absolute; bottom: -50px; right: -30px; transform: rotate(12deg); opacity: 0.8;">
@@ -415,14 +348,7 @@ This is the "why should I care" beat. The attributes on the span event aren't ma
 
 ## The Journey of a 👍 {data-transition="fade"}
 
-```{mermaid}
-%%| fig-width: 10
-sequenceDiagram
-  participant S as Server
-  participant M as Model
-  participant P as Phone
-  participant C as OTel Collector
-```
+![](images/swim-lanes/journey-21.png){.r-stretch}
 
 ::: {.notes}
 Empty diagram — just the four participants. Fade transition from the previous flowchart for visual continuity.
@@ -430,16 +356,7 @@ Empty diagram — just the four participants. Fade transition from the previous 
 
 ## The Journey of a 👍 {data-transition="none"}
 
-```{mermaid}
-%%| fig-width: 10
-sequenceDiagram
-  participant S as Server
-  participant M as Model
-  participant P as Phone
-  participant C as OTel Collector
-
-  S->>M: generate story part
-```
+![](images/swim-lanes/journey-20.png){.r-stretch}
 
 ::: {.notes}
 The server calls the model to generate a story part.
@@ -447,18 +364,7 @@ The server calls the model to generate a story part.
 
 ## The Journey of a 👍 {data-transition="none"}
 
-```{mermaid}
-%%| fig-width: 10
-sequenceDiagram
-  participant S as Server
-  participant M as Model
-  participant P as Phone
-  participant C as OTel Collector
-
-  activate S
-  Note right of S: storygen span
-  S->>M: generate story part
-```
+![](images/swim-lanes/journey-19.png){.r-stretch}
 
 ::: {.notes}
 This is wrapped in a storygen span — the activate bar shows the span is open while we wait for the model.
@@ -466,20 +372,7 @@ This is wrapped in a storygen span — the activate bar shows the span is open w
 
 ## The Journey of a 👍 {data-transition="none"}
 
-```{mermaid}
-%%| fig-width: 10
-sequenceDiagram
-  participant S as Server
-  participant M as Model
-  participant P as Phone
-  participant C as OTel Collector
-
-  activate S
-  Note right of S: storygen span
-  S->>M: generate story part
-  M-->>S: story part
-  deactivate S
-```
+![](images/swim-lanes/journey-18.png){.r-stretch}
 
 ::: {.notes}
 The model responds with the story part. The storygen span closes — it now contains the model name and response ID.
@@ -487,21 +380,7 @@ The model responds with the story part. The storygen span closes — it now cont
 
 ## The Journey of a 👍 {data-transition="none"}
 
-```{mermaid}
-%%| fig-width: 10
-sequenceDiagram
-  participant S as Server
-  participant M as Model
-  participant P as Phone
-  participant C as OTel Collector
-
-  activate S
-  Note right of S: storygen span
-  S->>M: generate story part
-  M-->>S: story part
-  deactivate S
-  S->>P: story + 𝘀𝗽𝗮𝗻𝗖𝗼𝗻𝘁𝗲𝘅𝘁
-```
+![](images/swim-lanes/journey-17.png){.r-stretch}
 
 ::: {.notes}
 The storygen span wraps the model call. After it closes, the server sends the story plus the spanContext to the phone. The spanContext is the token that will link everything together later.
@@ -509,24 +388,7 @@ The storygen span wraps the model call. After it closes, the server sends the st
 
 ## The Journey of a 👍 {data-transition="none"}
 
-```{mermaid}
-%%| fig-width: 10
-sequenceDiagram
-  participant S as Server
-  participant M as Model
-  participant P as Phone
-  participant C as OTel Collector
-
-  activate S
-  Note right of S: storygen span
-  S->>M: generate story part
-  M-->>S: story part
-  deactivate S
-  S->>P: story + 𝘀𝗽𝗮𝗻𝗖𝗼𝗻𝘁𝗲𝘅𝘁
-  rect rgb(77, 182, 172)
-  Note over P: user reads story
-  end
-```
+![](images/swim-lanes/journey-16.png){.r-stretch}
 
 ::: {.notes}
 The user reads the story. The phone is holding onto the spanContext this whole time.
@@ -534,50 +396,15 @@ The user reads the story. The phone is holding onto the spanContext this whole t
 
 ## The Journey of a 👍 {data-transition="none"}
 
-```{mermaid}
-%%| fig-width: 10
-sequenceDiagram
-  participant S as Server
-  participant M as Model
-  participant P as Phone
-  participant C as OTel Collector
-
-  activate S
-  Note right of S: storygen span
-  S->>M: generate story part
-  M-->>S: story part
-  deactivate S
-  S->>P: story + 𝘀𝗽𝗮𝗻𝗖𝗼𝗻𝘁𝗲𝘅𝘁
-  rect rgb(77, 182, 172)
-  Note over P: user reads story<br/>👍
-  end
-```
+![](images/swim-lanes/journey-15.png){.r-stretch}
 
 ::: {.notes}
-The user taps thumbs up.
+The user taps thumbs up. The teal box now shows the thumbs up emoji.
 :::
 
 ## The Journey of a 👍 {data-transition="none"}
 
-```{mermaid}
-%%| fig-width: 10
-sequenceDiagram
-  participant S as Server
-  participant M as Model
-  participant P as Phone
-  participant C as OTel Collector
-
-  activate S
-  Note right of S: storygen span
-  S->>M: generate story part
-  M-->>S: story part
-  deactivate S
-  S->>P: story + 𝘀𝗽𝗮𝗻𝗖𝗼𝗻𝘁𝗲𝘅𝘁
-  rect rgb(77, 182, 172)
-  Note over P: user reads story<br/>👍
-  end
-  P->>S: 👍 + 𝘀𝗽𝗮𝗻𝗖𝗼𝗻𝘁𝗲𝘅𝘁
-```
+![](images/swim-lanes/journey-14.png){.r-stretch}
 
 ::: {.notes}
 The phone sends the vote AND the spanContext back to the server. The spanContext has round-tripped: server to phone and back.
@@ -585,28 +412,7 @@ The phone sends the vote AND the spanContext back to the server. The spanContext
 
 ## The Journey of a 👍 {data-transition="none"}
 
-```{mermaid}
-%%| fig-width: 10
-sequenceDiagram
-  participant S as Server
-  participant M as Model
-  participant P as Phone
-  participant C as OTel Collector
-
-  activate S
-  Note right of S: storygen span
-  S->>M: generate story part
-  M-->>S: story part
-  deactivate S
-  S->>P: story + 𝘀𝗽𝗮𝗻𝗖𝗼𝗻𝘁𝗲𝘅𝘁
-  rect rgb(77, 182, 172)
-  Note over P: user reads story<br/>👍
-  end
-  P->>S: 👍 + 𝘀𝗽𝗮𝗻𝗖𝗼𝗻𝘁𝗲𝘅𝘁
-  activate S
-  Note right of S: evaluate satisfaction span
-  deactivate S
-```
+![](images/swim-lanes/journey-13.png){.r-stretch}
 
 ::: {.notes}
 The server creates the evaluate satisfaction span, links it to the storygen span using the spanContext.
@@ -614,28 +420,7 @@ The server creates the evaluate satisfaction span, links it to the storygen span
 
 ## The Journey of a 👍 {data-transition="none"}
 
-```{mermaid}
-%%| fig-width: 10
-sequenceDiagram
-  participant S as Server
-  participant M as Model
-  participant P as Phone
-  participant C as OTel Collector
-
-  activate S
-  Note right of S: storygen span
-  S->>M: generate story part
-  M-->>S: story part
-  deactivate S
-  S->>P: story + 𝘀𝗽𝗮𝗻𝗖𝗼𝗻𝘁𝗲𝘅𝘁
-  rect rgb(77, 182, 172)
-  Note over P: user reads story<br/>👍
-  end
-  P->>S: 👍 + 𝘀𝗽𝗮𝗻𝗖𝗼𝗻𝘁𝗲𝘅𝘁
-  activate S
-  Note right of S: evaluate satisfaction span<br/>contains 👍 span event
-  deactivate S
-```
+![](images/swim-lanes/journey-12.png){.r-stretch}
 
 ::: {.notes}
 The span event with the vote data lives inside the evaluate satisfaction span.
@@ -643,29 +428,7 @@ The span event with the vote data lives inside the evaluate satisfaction span.
 
 ## The Journey of a 👍 {data-transition="none"}
 
-```{mermaid}
-%%| fig-width: 10
-sequenceDiagram
-  participant S as Server
-  participant M as Model
-  participant P as Phone
-  participant C as OTel Collector
-
-  activate S
-  Note right of S: storygen span
-  S->>M: generate story part
-  M-->>S: story part
-  deactivate S
-  S->>P: story + 𝘀𝗽𝗮𝗻𝗖𝗼𝗻𝘁𝗲𝘅𝘁
-  rect rgb(77, 182, 172)
-  Note over P: user reads story<br/>👍
-  end
-  P->>S: 👍 + 𝘀𝗽𝗮𝗻𝗖𝗼𝗻𝘁𝗲𝘅𝘁
-  activate S
-  Note right of S: evaluate satisfaction span<br/>contains 👍 span event
-  deactivate S
-  S->>C: 👍 + spans + events + 𝘀𝗽𝗮𝗻𝗖𝗼𝗻𝘁𝗲𝘅𝘁
-```
+![](images/swim-lanes/journey-11.png){.r-stretch}
 
 **spanContext** links **storygen** span to **evaluate satisfaction** span
 
@@ -675,29 +438,7 @@ Everything flows to the OTel Collector via OTLP. The spanContext is what links t
 
 ## The Journey of a 👍 {data-transition="none"}
 
-```{mermaid}
-%%| fig-width: 10
-sequenceDiagram
-  participant S as Server
-  participant M as Model
-  participant P as Phone
-  participant C as OTel Collector
-
-  activate S
-  Note right of S: storygen span
-  S->>M: generate story part
-  M-->>S: story part
-  deactivate S
-  S->>P: story + 𝘀𝗽𝗮𝗻𝗖𝗼𝗻𝘁𝗲𝘅𝘁
-  rect rgb(77, 182, 172)
-  Note over P: user reads story<br/>👍
-  end
-  P->>S: 👍 + 𝘀𝗽𝗮𝗻𝗖𝗼𝗻𝘁𝗲𝘅𝘁
-  activate S
-  Note right of S: evaluate satisfaction span<br/>contains 👍 span event
-  deactivate S
-  S->>C: 👍 + spans + events + 𝘀𝗽𝗮𝗻𝗖𝗼𝗻𝘁𝗲𝘅𝘁
-```
+![](images/swim-lanes/journey-10.png){.r-stretch}
 
 OpenTelemetry receives a **holistic picture of one user's experience**
 
