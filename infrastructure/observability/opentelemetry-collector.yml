@@ -43,6 +43,11 @@ spec:
                 where name == "gen_ai.evaluation.result"
               - set(span.attributes["story.part"], attributes["story.part"])
                 where name == "gen_ai.evaluation.result"
+      filter/spanmetrics:
+        error_mode: ignore
+        traces:
+          span:
+            - 'name != "evaluate UserSatisfaction"'
       batch:
         timeout: 10s
 
@@ -54,10 +59,6 @@ spec:
           peer_tags_aggregation: true
       spanmetrics:
         namespace: gen_ai
-        include:
-          match_type: strict
-          span_names:
-            - "evaluate UserSatisfaction"
         histogram:
           explicit:
             buckets: [1]
@@ -80,7 +81,11 @@ spec:
         traces:
           receivers: [otlp]
           processors: [transform, batch]
-          exporters: [spanmetrics, datadog/connector, datadog]
+          exporters: [datadog/connector, datadog]
+        traces/spanmetrics:
+          receivers: [otlp]
+          processors: [transform, filter/spanmetrics, batch]
+          exporters: [spanmetrics]
         metrics:
           receivers: [spanmetrics, datadog/connector, otlp, prometheus]
           processors: [batch]
