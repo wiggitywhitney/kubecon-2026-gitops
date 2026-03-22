@@ -8,72 +8,124 @@ title-slide-attributes:
 
 ## {.center}
 
-<h2 style="font-size: 1.8em; margin-bottom: 0.8em;">What We're Building</h2>
-
-<p style="font-size: 1.3em;">A live feedback loop where<br/>**audience votes** drive infrastructure decisions.</p>
+<p style="font-size: 1.3em;">When AI-generated text goes straight to users, how do you know whether it is good?</p>
 
 ::: {.notes}
-Welcome slide. Set context: in this talk, the audience will participate in two live demo rounds. Their votes on AI-generated stories will literally control the infrastructure — Flagger shifts traffic based on which variant gets more thumbs up. Between demos, we pull back the curtain and show how it all works.
+Premise slide 1. With traditional apps, you can measure quality deterministically — response time, error rates, status codes, schema validation, latency percentiles. You can write assertions against all of these. But when the output is AI-generated text, none of that tells you whether the content is actually good. Quality is subjective.
+:::
+
+## {.center data-transition="none"}
+
+<p style="font-size: 1.8em;">**User feedback.**</p>
+
+::: {.notes}
+A lot of GenAI apps already collect this. As a user, you can probably think of a time you used a GenAI tool or chatbot or something, and it asked you to give a thumbs up or thumbs down to the response.
+:::
+
+## {.center data-transition="none"}
+
+<p style="font-size: 1.3em;">So why not roll out an application change based on whether your users **prefer it**?</p>
+
+::: {.notes}
+The pitch. If user feedback is the only reliable signal, then use it to drive deployment decisions. This is what we're about to demonstrate live.
+:::
+
+# Live Demo {.center}
+
+<img src="images/Flat_Zigzag_Yellow_Pink.png" width="200" style="position: absolute; top: -40px; right: -30px; transform: rotate(0deg); opacity: 0.7;">
+
+::: {.notes}
+Section divider: Round 1 Live Demo. Audience experiences the app for the first time with zero context.
+:::
+
+## Let's Try It
+
+You're about to read a short AI-generated story.
+
+After each part, vote: **thumbs up** or **thumbs down**.
+
+That's it. Just read and react.
+
+<img src="images/Black_Line_Yellow_Bulb.png" width="300" style="position: absolute; bottom: -50px; right: -30px; transform: rotate(-6deg);">
+
+::: {.notes}
+PRESENTER CUE: Keep this simple — don't reveal that there are two variants or what the difference is. The audience should just experience the app naturally. Switch to the Datadog dashboard on screen, THEN reveal the URL. The reveal of dry vs funny comes AFTER voting, in the debrief slide.
+:::
+
+## Time to Vote! {.center}
+
+![](images/qr-story-app-1.png){width=400}
+
+Read each story part. Vote thumbs up or thumbs down.
+
+::: {.notes}
+PRESENTER CUE: QR code goes to story-app-1. Advance story parts from the admin panel as votes come in. Let 2-3 story parts play out (~3-4 minutes). When ready, click through to the dashboard slide.
+:::
+
+## [Live Dashboard](https://app.datadoghq.com/dashboard/68y-xeg-j6s?tv_mode=true) {.center}
+
+Watch the votes come in:
+
+**[Open Datadog Dashboard](https://app.datadoghq.com/dashboard/68y-xeg-j6s?tv_mode=true)**
+
+::: {.notes}
+PRESENTER CUE: Click the link to open the Datadog dashboard in TV mode. This shows votes per variant and satisfaction rates updating in real time. Stay on this while the audience votes. The dashboard URL is: https://app.datadoghq.com/dashboard/68y-xeg-j6s?tv_mode=true
+:::
+
+## The Reveal
+
+There were **two versions** of that story.
+
+| | Variant A | Variant B |
+|---|---|---|
+| **Tone** | Dry, matter-of-fact | Funny, playful |
+
+::: {.notes}
+The big reveal. The audience didn't know there were two variants. Now show the Datadog dashboard — the funnier variant should have higher satisfaction. Point out that the platform was already shifting traffic toward the winner while they were voting.
+:::
+
+## {.center data-transition="none"}
+
+<p style="font-size: 1.3em;">The platform **shifted traffic** toward the variant you liked more.</p>
+
+::: {.notes}
+Transition to teaching scenes. The audience just experienced the feedback loop. Now we pull back the curtain and explain every component.
 :::
 
 # The App {.center}
 
 ::: {.notes}
-Section divider: Scene 1 — What the audience sees. Ground them in the user experience before any infrastructure talk.
+Section divider: Now we explain what the audience just experienced.
 :::
 
-## What You'll See {.center}
+## {.spaced data-transition="none"}
+
+We started with 100% traffic going to the boring version
 
 ::: {.notes}
-Scene 1 opening — blank title slide. Pause here before revealing details one at a time.
+Everyone was on variant A — the dry, matter-of-fact storyteller.
 :::
 
-## What You'll See {.spaced data-transition="none"}
+## {.spaced data-transition="none"}
 
-You'll open a URL on your phone
+We started with 100% traffic going to the boring version
+
+Then we introduced a funny version
 
 ::: {.notes}
-First reveal: just the basic action. The audience will open a URL.
+Then variant B — the funny version — was deployed alongside it.
 :::
 
-## What You'll See {.spaced data-transition="none"}
+## {.spaced data-transition="none"}
 
-You'll open a URL on your phone
+We started with 100% traffic going to the boring version
 
-You'll read a short **AI-generated story** (5 parts)
+Then we introduced a funny version
 
-::: {.notes}
-Second reveal: the content. AI-generated story, 5 parts. The story is about 100 words per part, with named characters.
-:::
-
-## What You'll See {.spaced data-transition="none"}
-
-You'll open a URL on your phone
-
-You'll read a short **AI-generated story** (5 parts)
-
-After each part, you vote: **thumbs up** or **thumbs down**
+If its likeability performed better, it got **rolled out**
 
 ::: {.notes}
-Third reveal: the interaction. Thumbs up or thumbs down on each part. Simple binary feedback.
-:::
-
-## What You Don't See {.spaced data-transition="none"}
-
-**Two variants** of the app exist
-
-::: {.notes}
-New section — what the audience doesn't see. Two variants are running simultaneously. Everyone starts on variant A (the boring one). As votes come in, the platform decides whether to shift traffic to variant B.
-:::
-
-## What You Don't See {.spaced data-transition="none"}
-
-**Two variants** of the app exist
-
-Your votes **control what happens next**
-
-::: {.notes}
-The punchline. Their votes aren't just feedback — they're driving infrastructure decisions in real time. The platform will shift traffic based on which variant gets more thumbs up. Don't explain the mechanism yet. Let them sit with the mystery before moving to Scene 2.
+The platform used their votes to decide whether to shift traffic. Now show the architecture.
 :::
 
 ## Two Apps, One Stage {data-transition="none"}
@@ -81,13 +133,16 @@ The punchline. Their votes aren't just feedback — they're driving infrastructu
 ```{mermaid}
 %%| fig-width: 10
 flowchart LR
-  A["Variant A<br/>story-app-1a"] ~~~ B["Variant B<br/>story-app-1b"]
+  subgraph knative ["Knative Service: story-app-1"]
+    A["Variant A<br/>story-app-1a"] ~~~ B["Variant B<br/>story-app-1b"]
+  end
+  style knative fill:none,stroke:#00897B,stroke-width:2px
 ```
 
-Two Knative Services running **different container images**
+Same container image, **different configuration** — Flagger manages the canary
 
 ::: {.notes}
-Scene 2, step 1: Start simple. Two Knative Services running side by side. Different images, different behavior. The key insight: variant differentiation via container images, not feature flags. Each has a pod label (app: story-app-1a vs story-app-1b) that becomes the OTel service.name via the Instrumentation CR.
+Scene 2, step 1: Start simple. One Knative Service per story. Flagger manages the canary: when a config change is pushed via GitOps, Flagger creates variant B alongside the existing variant A. Same container image, different configuration (e.g., different AI model). The story_name attribute distinguishes them in metrics.
 :::
 
 ## Full Architecture {data-transition="none"}
@@ -100,6 +155,11 @@ flowchart LR
   va & vb -->|" "| collector[" "]
   collector -->|" "| platform[" "]
   platform -.->|" "| audience
+  subgraph knative ["Knative Service"]
+    va
+    vb
+  end
+  style knative fill:none,stroke:#00897B,stroke-width:2px
   style collector fill:none,stroke:none
   style platform fill:none,stroke:none
   linkStyle 2 stroke:none
@@ -124,6 +184,11 @@ flowchart LR
   va & vb -->|"telemetry"| collector["OTel Collector"]
   collector -->|" "| platform[" "]
   platform -.->|" "| audience
+  subgraph knative ["Knative Service"]
+    va
+    vb
+  end
+  style knative fill:none,stroke:#00897B,stroke-width:2px
   style platform fill:none,stroke:none
   linkStyle 4 stroke:none
   linkStyle 5 stroke:none
@@ -145,6 +210,11 @@ flowchart LR
   va & vb -->|"telemetry"| collector["OTel Collector"]
   collector -->|"metrics"| platform["Platform"]
   platform -.->|" "| audience
+  subgraph knative ["Knative Service"]
+    va
+    vb
+  end
+  style knative fill:none,stroke:#00897B,stroke-width:2px
   linkStyle 5 stroke:none
 ```
 
@@ -164,6 +234,11 @@ flowchart LR
   va & vb -->|"telemetry"| collector["OTel Collector"]
   collector -->|"metrics"| platform["Platform"]
   platform -.->|"roll out winner"| audience
+  subgraph knative ["Knative Service"]
+    va
+    vb
+  end
+  style knative fill:none,stroke:#00897B,stroke-width:2px
 ```
 
 The platform uses those metrics to **roll out the more popular variant**
@@ -815,8 +890,8 @@ processors:
     trace_statements:
       - context: spanevent
         statements:
-          - set(span.attributes["score.label"],
-                attributes["score.label"])
+          - set(span.attributes["gen_ai.evaluation.score.label"],
+                attributes["gen_ai.evaluation.score.label"])
             where name == "gen_ai.evaluation.result"
 ```
 
@@ -846,18 +921,19 @@ The spanmetrics connector reads the promoted attributes on each span and produce
 
 ## The Spanmetrics Connector {data-transition="none"}
 
-```{.yaml code-line-numbers="|2-3|4-6|7"}
+```{.yaml code-line-numbers="|2-3|4-7|8"}
 connectors:
   spanmetrics:
     namespace: gen_ai
     dimensions:
       - name: gen_ai.evaluation.score.label
+      - name: story.name
       - name: story.part
     metrics_flush_interval: 15s
 ```
 
 ::: {.notes}
-Walk through the real YAML. First highlight: spanmetrics connector with namespace gen_ai (produces metric gen_ai_calls_total). Second highlight: dimensions — these are the promoted attributes from the transform step. Third highlight: flush every 15 seconds. The result is a counter metric with dimensions for service_name, score.label, and story.part.
+Walk through the real YAML. First highlight: spanmetrics connector with namespace gen_ai (produces metric gen_ai_calls_total). Second highlight: dimensions — these are the promoted attributes from the transform step, plus story.name to distinguish variants. Third highlight: flush every 15 seconds. The result is a counter metric with dimensions for story_name, score.label, and story.part.
 :::
 
 ## The Collector Pipeline {data-transition="none"}
@@ -1103,10 +1179,10 @@ Section divider: Round 2 Live Demo. Now the audience understands the infrastruct
 
 ## Time to Vote. Again! {.center}
 
-### Scan the QR code
+![](images/qr-story-app-2.png){width=400}
 
 ::: {.notes}
-PRESENTER CUE: Same URL as before. Advance story parts from the admin panel. Let 2-3 story parts play out (~3-4 minutes). This time, also narrate what's happening: "The platform is watching your votes right now. If one model pulls ahead, traffic will shift."
+PRESENTER CUE: QR code goes to story-app-2. Advance story parts from the admin panel. Let 2-3 story parts play out (~3-4 minutes). This time, also narrate what's happening: "The platform is watching your votes right now. If one model pulls ahead, traffic will shift."
 :::
 
 ## [Live Dashboard](https://app.datadoghq.com/dashboard/68y-xeg-j6s?tv_mode=true) {.center}
@@ -1127,7 +1203,7 @@ PRESENTER CUE: Click the link to open the Datadog dashboard in TV mode. This tim
 | **Model** | Mistral Medium (cheap) | Opus 4.6 (expensive) |
 
 ::: {.notes}
-Reveal the model difference. Show the Datadog dashboard results. The expensive model might not have won — that's the point.
+Reveal the model difference. Show the Datadog dashboard results. The expensive model might not have won — that's the point. (Model names TBD — Thomas changing to Anthropic big vs Mistral small.)
 :::
 
 ## {.center data-transition="none"}
