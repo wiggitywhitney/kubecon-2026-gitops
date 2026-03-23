@@ -752,7 +752,43 @@ The connector generates additional metrics from traces, and the exporter ships d
 
 ![](images/thomas/canary-4.png){.r-stretch}
 
-# Story Time {.center}
+# GenAI-Infused Application {.center data-transition="none"}
+
+<span style="position: absolute; bottom: 20px; right: 40px; font-size: 4em; opacity: 0.8;">🤖</span>
+
+## Java Application {.center data-transition="none"}
+
+![](images/thomas/app-architecture-1.png){.r-stretch}
+
+## Java Application {.center data-transition="none"}
+
+![](images/thomas/app-architecture-2.png){.r-stretch}
+
+## Java Application {.center data-transition="none"}
+
+![](images/thomas/app-architecture-3.png){.r-stretch}
+
+## Java Application {.center data-transition="none"}
+
+![](images/thomas/app-architecture-4.png){.r-stretch}
+
+## Java Application {.center data-transition="none"}
+
+![](images/thomas/app-architecture-5.png){.r-stretch}
+
+## Spring AI {.center data-transition="none"}
+
+![](images/thomas/spring-ai-1.png){.r-stretch}
+
+## Spring AI {.center data-transition="none"}
+
+![](images/thomas/spring-ai-2.png){.r-stretch}
+
+## Spring AI {.center data-transition="none"}
+
+![](images/thomas/spring-ai-3.png){.r-stretch}
+
+# Story Time {.center data-transition="none"}
 
 <span style="position: absolute; bottom: 20px; right: 40px; font-size: 4em; opacity: 0.8;">📖</span>
 
