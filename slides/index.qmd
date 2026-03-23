@@ -11,7 +11,7 @@ title-slide-attributes:
 <p style="font-size: 1.3em;">When AI-generated text goes straight to users, how do you know whether it is good?</p>
 
 ::: {.notes}
-Premise slide 1. With traditional apps, you can measure quality deterministically — response time, error rates, status codes, schema validation, latency percentiles. You can write assertions against all of these. But when the output is AI-generated text, none of that tells you whether the content is actually good. Quality is subjective.
+With traditional apps, you can measure quality deterministically — response time, error rates, status codes, etc. But when the output is AI-generated, none of that tells you whether the content is actually good. Quality is subjective. So how do you know that the GenAI content that you're putting out into the world is achieving its purpose? You know by measuring...
 :::
 
 ## {.center data-transition="none"}
@@ -19,15 +19,15 @@ Premise slide 1. With traditional apps, you can measure quality deterministicall
 <p style="font-size: 1.8em;">**User feedback.**</p>
 
 ::: {.notes}
-A lot of GenAI apps already collect this. As a user, you can probably think of a time you used a GenAI tool or chatbot or something, and it asked you to give a thumbs up or thumbs down to the response.
+User feedback. A lot of GenAI apps already collect this. As a user, you can probably think of a time you used a GenAI tool or chatbot or something, and it asked you to give a thumbs up or thumbs down to the response. So why not...
 :::
 
 ## {.center data-transition="none"}
 
-<p style="font-size: 1.3em;">So why not roll out an application change based on whether your users **prefer it**?</p>
+<p style="font-size: 1.3em;">Roll out an application change based on whether your users **prefer it**</p>
 
 ::: {.notes}
-The pitch. If user feedback is the only reliable signal, then use it to drive deployment decisions. This is what we're about to demonstrate live.
+... roll out an app change based on whether your users prefer it? If user feedback is the only reliable signal, then use it to drive deployment decisions. 
 :::
 
 # Live Demo {.center}
@@ -35,10 +35,10 @@ The pitch. If user feedback is the only reliable signal, then use it to drive de
 <img src="images/Flat_Zigzag_Yellow_Pink.png" width="200" style="position: absolute; top: -40px; right: -30px; transform: rotate(0deg); opacity: 0.7;">
 
 ::: {.notes}
-Section divider: Round 1 Live Demo. Audience experiences the app for the first time with zero context.
+But you don't have to take our word for it. Let's jump right in and do a live demo of an application rollout based on user feedback. At first, most of you will receive an older version of an app that tells a story in 5 parts. We're rolling out a version that we think you'll like better. But it will only roll out if you upvote it.
 :::
 
-## Let's Try It
+## Do the thing!
 
 You're about to read a short AI-generated story.
 
@@ -49,7 +49,6 @@ That's it. Just read and react.
 <img src="images/Black_Line_Yellow_Bulb.png" width="300" style="position: absolute; bottom: -50px; right: -30px; transform: rotate(-6deg);">
 
 ::: {.notes}
-PRESENTER CUE: Keep this simple — don't reveal that there are two variants or what the difference is. The audience should just experience the app naturally. Switch to the Datadog dashboard on screen, THEN reveal the URL. The reveal of dry vs funny comes AFTER voting, in the debrief slide.
 :::
 
 ## Time to Vote! {.center}
@@ -59,29 +58,40 @@ PRESENTER CUE: Keep this simple — don't reveal that there are two variants or 
 Read each story part. Vote thumbs up or thumbs down.
 
 ::: {.notes}
-PRESENTER CUE: QR code goes to story-app-1. Advance story parts from the admin panel as votes come in. Let 2-3 story parts play out (~3-4 minutes). When ready, click through to the dashboard slide.
+The application change is rolling out over 4 minutes or so. Every 30 seconds Flagger evaluates whether the new version is performing better than the old version, and if so, it sends more traffic to the new version. If you don't know Flagger, don't worry, we'll talk more about it later.
 :::
 
-## [Live Dashboard](https://app.datadoghq.com/dashboard/68y-xeg-j6s?tv_mode=true) {.center}
+## [Live Dashboard](https://app.datadoghq.com/dashboard/68y-xeg-j6s) {.center}
 
 Watch the votes come in:
 
-**[Open Datadog Dashboard](https://app.datadoghq.com/dashboard/68y-xeg-j6s?tv_mode=true)**
+**[Open Datadog Dashboard](https://app.datadoghq.com/dashboard/68y-xeg-j6s)**
 
 ::: {.notes}
-PRESENTER CUE: Click the link to open the Datadog dashboard in TV mode. This shows votes per variant and satisfaction rates updating in real time. Stay on this while the audience votes. The dashboard URL is: https://app.datadoghq.com/dashboard/68y-xeg-j6s?tv_mode=true
 :::
 
-## The Reveal
-
-There were **two versions** of that story.
-
-| | Variant A | Variant B |
-|---|---|---|
-| **Tone** | Dry, matter-of-fact | Funny, playful |
+## Did you figure out the **two versions** of that story? {.center}
 
 ::: {.notes}
-The big reveal. The audience didn't know there were two variants. Now show the Datadog dashboard — the funnier variant should have higher satisfaction. Point out that the platform was already shifting traffic toward the winner while they were voting.
+Did you put it together?
+:::
+
+## {.center data-transition="none"}
+
+Variant A had a more boring tone.
+
+::: {.notes}
+The original app, Variant A, told the story in a straightforward, matter-of-fact manner.
+:::
+
+## {.center data-transition="none"}
+
+Variant B had a more playful tone.
+
+::: {.notes}
+And the prompt of the app we rolled out — Variant B — instructed the LLM to write a funny and playful story.
+
+So we essentially pitted one prompt against an updated prompt.
 :::
 
 ## {.center data-transition="none"}
@@ -89,60 +99,12 @@ The big reveal. The audience didn't know there were two variants. Now show the D
 <p style="font-size: 1.3em;">The platform **shifted traffic** toward the variant you liked more.</p>
 
 ::: {.notes}
-Transition to teaching scenes. The audience just experienced the feedback loop. Now we pull back the curtain and explain every component.
 :::
 
 # The App {.center}
 
 ::: {.notes}
-Section divider: Now we explain what the audience just experienced.
-:::
-
-## {.spaced data-transition="none"}
-
-We started with 100% traffic going to the boring version
-
-::: {.notes}
-Everyone was on variant A — the dry, matter-of-fact storyteller.
-:::
-
-## {.spaced data-transition="none"}
-
-We started with 100% traffic going to the boring version
-
-Then we introduced a funny version
-
-::: {.notes}
-Then variant B — the funny version — was deployed alongside it.
-:::
-
-## {.spaced data-transition="none"}
-
-We started with 100% traffic going to the boring version
-
-Then we introduced a funny version
-
-If its likeability performed better, it got **rolled out**
-
-::: {.notes}
-The platform used their votes to decide whether to shift traffic. Now show the architecture.
-:::
-
-## Two Apps, One Stage {data-transition="none"}
-
-```{mermaid}
-%%| fig-width: 10
-flowchart LR
-  subgraph knative ["Knative Service: story-app-1"]
-    A["Variant A<br/>story-app-1a"] ~~~ B["Variant B<br/>story-app-1b"]
-  end
-  style knative fill:none,stroke:#00897B,stroke-width:2px
-```
-
-Same container image, **different configuration** — Flagger manages the canary
-
-::: {.notes}
-Scene 2, step 1: Start simple. One Knative Service per story. Flagger manages the canary: when a config change is pushed via GitOps, Flagger creates variant B alongside the existing variant A. Same container image, different configuration (e.g., different AI model). The story_name attribute distinguishes them in metrics.
+Let's talk about what's going on at the app-level that helps to enable this.
 :::
 
 ## Full Architecture {data-transition="none"}
@@ -168,10 +130,10 @@ flowchart LR
   linkStyle 5 stroke:none
 ```
 
-Each story part, you might get **A or B** — it can switch mid-story
+Each story part, a user might get **A or B**
 
 ::: {.notes}
-This isn't a static A/B test. You might get variant A for part 1 and variant B for part 3 — it depends on which variant is winning.
+We did a canary rollout, where, at first, the new, funnier prompt got only 20% of traffic. 
 :::
 
 ## Full Architecture {data-transition="none"}
@@ -197,7 +159,7 @@ flowchart LR
 Both variants send telemetry to the same **OTel Collector**
 
 ::: {.notes}
-Every vote, every story generation creates spans and span events. They all flow to the same collector, which is how we can compare the two variants.
+Every vote creates spans and span events. They all flow to the same OpenTelemetry collector. We use the collector to convert spans to metrics, which is how we can compare the two variants. I'll talk more about the collector in a bit.
 :::
 
 ## Full Architecture {data-transition="none"}
@@ -221,7 +183,7 @@ flowchart LR
 The collector turns telemetry into **comparable metrics**
 
 ::: {.notes}
-Specifically, thumbs up percentage per variant. The platform (Flagger) watches these metrics.
+The platform (Flagger) watches these metrics. Specifically, it watches the thumbs up percentage per variant. 
 :::
 
 ## Full Architecture {data-transition="none"}
@@ -241,42 +203,34 @@ flowchart LR
   style knative fill:none,stroke:#00897B,stroke-width:2px
 ```
 
-The platform uses those metrics to **roll out the more popular variant**
+The platform uses those metrics to decide whether to **roll out the new variant** or let it die
 
 ::: {.notes}
-The platform shifts traffic toward whichever variant has higher satisfaction. This is the feedback loop — audience votes become telemetry, telemetry becomes metrics, metrics drive the rollout, and the audience gets more of the variant they prefer. We'll dig into each of these steps after Round 1.
+If the new variant (in our case, the playful one) performs better, the platform sends more traffic to it. If not, it automatically gets rolled back. 
+
+Flagger polls every 30s and if the playful prompt keeps getting upvoted, Flagger keeps sending a little bit more traffic to it.
 :::
 
-# How It Works {.center}
-
-<img src="images/Isometric_Grid_Green_Pink.png" width="250" style="position: absolute; bottom: -50px; right: -30px; transform: rotate(12deg); opacity: 0.8;">
+# From Votes to Metrics {.center}
 
 ::: {.notes}
-Section divider: Teaching scenes. Now we explain the infrastructure behind what they just experienced.
-:::
 
-## How a Vote Becomes Data {.center}
-
-::: {.notes}
-Scene 3 title slide. This is where we introduce OpenTelemetry for the first time.
 :::
 
 ## You Tap Thumbs Up {data-transition="none"}
 
 ```{mermaid}
-%%| fig-width: 10
 graph TD
   user["You"] -->|"👍"| server["Server"]
 ```
 
 ::: {.notes}
-Start simple. The user taps thumbs up. What happens inside the server?
+When you tap thumbs up, what happens inside the server?
 :::
 
 ## The Server Creates a Span {data-transition="none"}
 
 ```{mermaid}
-%%| fig-width: 10
 graph TD
   user["You"] -->|"👍"| server["Server"]
   server --> span
@@ -287,16 +241,15 @@ graph TD
   style otel fill:none,stroke:#00897B,stroke-width:2px
 ```
 
-The server creates an **OpenTelemetry span** — a unit of work
+The server creates an **OpenTelemetry span**
 
 ::: {.notes}
-First mention of OpenTelemetry. A span is a structured unit of work — connected to other spans in a trace. The server creates one called "evaluate UserSatisfaction" every time someone votes.
+The server creates an **OpenTelemetry span**. A span is a way to represent a structured unit of work in OTel. Spans connect to other spans and together tell the story of the journey of a request in an object called a trace. The server creates a span called "evaluate UserSatisfaction" every time someone votes.
 :::
 
 ## The Vote Creates a Span Event {data-transition="none"}
 
 ```{mermaid}
-%%| fig-width: 10
 graph TD
   user["You"] -->|"👍"| server["Server"]
   server --> span
@@ -308,10 +261,8 @@ graph TD
   style otel fill:none,stroke:#00897B,stroke-width:2px
 ```
 
-The vote is recorded as a **span event** inside the span
-
 ::: {.notes}
-The span event appears as a child of the span. It's called gen_ai.evaluation.result and it carries the vote data. The audience sees the visual relationship before we explain what a span event is.
+The vote itself is recorded as a span event inside the span. The span event appears as a child of the span. It's called gen_ai.evaluation.result and it carries the vote data.
 :::
 
 ## {.center data-transition="none"}
@@ -319,7 +270,6 @@ The span event appears as a child of the span. It's called gen_ai.evaluation.res
 <h2 style="font-size: 1.8em;">What's a span event?</h2>
 
 ::: {.notes}
-Pause here. Let the question land. Most people think OTel = spans and metrics. Span events are the underused third concept.
 :::
 
 ## {.center data-transition="none"}
@@ -331,30 +281,34 @@ Pause here. Let the question land. Most people think OTel = spans and metrics. S
 <p style="font-size: 1.3em;">Automatically correlated with the trace</p>
 
 ::: {.notes}
-A span event is a thing that happened during a span — like a log entry, but it lives inside the span, so you get trace context for free. No manual correlation needed.
+A span event is a thing that happened at a specific time during a span. It is basically a log that lives inside the span, so you get trace context without having to manually add correlation.
+
+Fun fact: the OpenTelemetry community deprecated the Span Events API literally last week. The replacement is log-based events via the Logs API. The data and the correlation are the same.
 :::
 
 ## Semantic Conventions {.center data-transition="none"}
 
 <p style="font-size: 1.3em; margin-bottom: 1em;">**gen_ai semantic conventions**</p>
 
-<p style="font-size: 1.1em;">A standard vocabulary — not custom fields</p>
+<p style="font-size: 1.1em;">A standard vocabulary</p>
 
 <p style="font-size: 1.1em;">Any OTel-compatible tool knows what these mean</p>
 
 ::: {.notes}
-This is the "why should I care" beat. The attributes on the span event aren't made up — they follow gen_ai semantic conventions. score.label = thumbs_up, score.value = 1.0, story.part = 3. Because these are standardized, any OTel tool (Datadog, Jaeger, Grafana) can read and act on them without custom configuration.
+Because these are standardized, any OpenTelemetry tool (Datadog, Jaeger, Grafana) can read and act on them without custom configuration.
+
+The user.id v user-id v userId v user_id example.
 :::
 
-## The Journey of a 👍 {data-transition="fade"}
+## The Journey of a 👍 {.center data-transition="fade"}
 
 ![](images/swim-lanes/journey-21.png){.r-stretch}
 
 ::: {.notes}
-Empty diagram — just the four participants. Fade transition from the previous flowchart for visual continuity.
+So the journey of a 👍 goes like this...
 :::
 
-## The Journey of a 👍 {data-transition="none"}
+## The Journey of a 👍 {.center data-transition="none"}
 
 ![](images/swim-lanes/journey-20.png){.r-stretch}
 
@@ -362,88 +316,88 @@ Empty diagram — just the four participants. Fade transition from the previous 
 The server calls the model to generate a story part.
 :::
 
-## The Journey of a 👍 {data-transition="none"}
+## The Journey of a 👍 {.center data-transition="none"}
 
 ![](images/swim-lanes/journey-19.png){.r-stretch}
 
 ::: {.notes}
-This is wrapped in a storygen span — the activate bar shows the span is open while we wait for the model.
+This starts the recording of the storygen span.
 :::
 
-## The Journey of a 👍 {data-transition="none"}
+## The Journey of a 👍 {.center data-transition="none"}
 
 ![](images/swim-lanes/journey-18.png){.r-stretch}
 
 ::: {.notes}
-The model responds with the story part. The storygen span closes — it now contains the model name and response ID.
+The model responds with the story part. The storygen span ends. The span now contains the model name, the prompt, and the response ID.
 :::
 
-## The Journey of a 👍 {data-transition="none"}
+## The Journey of a 👍 {.center data-transition="none"}
 
 ![](images/swim-lanes/journey-17.png){.r-stretch}
 
 ::: {.notes}
-The storygen span wraps the model call. After it closes, the server sends the story plus the spanContext to the phone. The spanContext is the token that will link everything together later.
+After it closes, the server sends the story part plus spanContext to you, the user. The spanContext is a type of token.
 :::
 
-## The Journey of a 👍 {data-transition="none"}
+## The Journey of a 👍 {.center data-transition="none"}
 
 ![](images/swim-lanes/journey-16.png){.r-stretch}
 
 ::: {.notes}
-The user reads the story. The phone is holding onto the spanContext this whole time.
+While you read the story, your device is holding onto the spanContext.
 :::
 
-## The Journey of a 👍 {data-transition="none"}
+## The Journey of a 👍 {.center data-transition="none"}
 
 ![](images/swim-lanes/journey-15.png){.r-stretch}
 
 ::: {.notes}
-The user taps thumbs up. The teal box now shows the thumbs up emoji.
+You vote! This is not captured by a span because it is client side.
 :::
 
-## The Journey of a 👍 {data-transition="none"}
+## The Journey of a 👍 {.center data-transition="none"}
 
 ![](images/swim-lanes/journey-14.png){.r-stretch}
 
 ::: {.notes}
-The phone sends the vote AND the spanContext back to the server. The spanContext has round-tripped: server to phone and back.
+Your device sends your vote AND the spanContext back to the server.
+
+The spanContext has round-tripped: server to phone and back.
 :::
 
-## The Journey of a 👍 {data-transition="none"}
+## The Journey of a 👍 {.center data-transition="none"}
 
 ![](images/swim-lanes/journey-13.png){.r-stretch}
 
 ::: {.notes}
-The server creates the evaluate satisfaction span, links it to the storygen span using the spanContext.
+The server starts the evaluate satisfaction span, and uses the spanContext token to link it to the storygen span.
 :::
 
-## The Journey of a 👍 {data-transition="none"}
+## The Journey of a 👍 {.center data-transition="none"}
 
 ![](images/swim-lanes/journey-12.png){.r-stretch}
 
 ::: {.notes}
-The span event with the vote data lives inside the evaluate satisfaction span.
+The span event with the vote data lives inside this 'evaluate satisfaction' span.
 :::
 
-## The Journey of a 👍 {data-transition="none"}
+## The Journey of a 👍 {.center data-transition="none"}
 
 ![](images/swim-lanes/journey-11.png){.r-stretch}
 
-**spanContext** links **storygen** span to **evaluate satisfaction** span
-
 ::: {.notes}
-Everything flows to the OTel Collector via OTLP. The spanContext is what links the storygen span to the evaluate satisfaction span.
+Everything flows to the OTel Collector via OTLP. 
+
+Because of that spanContext token, the 'storygen' span is linked to 'evaluate satisfaction' span, so therefore your vote is correlated to information about what prompt and model were used for the story generation.
 :::
 
-## The Journey of a 👍 {data-transition="none"}
+## The Journey of a 👍 {.center data-transition="none"}
 
 ![](images/swim-lanes/journey-10.png){.r-stretch}
 
-OpenTelemetry receives a **holistic picture of one user's experience**
-
 ::: {.notes}
-The punchline. OpenTelemetry now has the complete picture: what was generated, by which model, for which variant, and how the user felt about it. This bridges into Scene 4 — what the collector does with this data.
+OpenTelemetry now has the complete picture: what was generated, by which prompt and which model, and how the user felt about it.
 :::
 
 ## Here's What It Looks Like {.center data-transition="none"}
@@ -451,25 +405,25 @@ The punchline. OpenTelemetry now has the complete picture: what was generated, b
 **[See a real trace in Datadog](https://app.datadoghq.com/apm/traces?query=operation_name%3Aevaluate%20UserSatisfaction)**
 
 ::: {.notes}
-PRESENTER CUE: Click this link to open Datadog APM traces filtered to evaluate satisfaction spans. Pick any trace, expand it, show the span event with its attributes. Quick aside — 30 seconds max — then back to slides. This only works if Thomas's cluster is running and has recent traffic.
+Click this link to open Datadog APM traces filtered to evaluate satisfaction spans. 
 :::
 
 ## {.center data-transition="none"}
 
-<h2 style="font-size: 1.6em;">But how does an app scale on traces?</h2>
+<p style="font-size: 1.3em;">So we talked about how the right **trace data** gets into the collector...</p>
 
 ::: {.notes}
-Let the question land. The audience has seen how votes become telemetry. But Flagger doesn't read traces — it reads metrics. How do we get from one to the other?
+So we talked about how the right **trace data** gets into the collector...
 :::
 
 ## {.center data-transition="none"}
 
-<h2 style="font-size: 1.6em; margin-bottom: 1em;">But how does an app scale on traces?</h2>
-
-<p style="font-size: 1.3em;">I thought Flagger uses Prometheus metrics to know when to scale.</p>
+<p style="font-size: 1.3em;">...Now let's talk about how the right **metrics** come out of it</p>
 
 ::: {.notes}
-The audience should be wondering this. Flagger uses PromQL queries against Prometheus metrics. But everything we've shown so far is traces and span events. This tension is exactly what Scene 4 resolves.
+...Now let's talk about how the right **metrics** come out of it
+
+We need metrics because that is what Flagger uses to scale the application.
 :::
 
 ## {.spaced .center}
@@ -477,7 +431,7 @@ The audience should be wondering this. Flagger uses PromQL queries against Prome
 To turn **trace data** into **metric data**, we need two things:
 
 ::: {.notes}
-Set the context. The audience knows how votes become telemetry (Scene 3). Now they need to understand the two transformations required.
+To turn **trace data** into **metric data**, we need two things:
 :::
 
 ## {.spaced .center data-transition="none"}
@@ -487,7 +441,9 @@ To turn **trace data** into **metric data**, we need two things:
 1. Make our nested span event **accessible at the span level**
 
 ::: {.notes}
-First goal: the vote data is trapped inside a span event. We need to surface it to the span level so downstream processors can read it.
+1. Make our nested span event **accessible at the span level**
+
+The vote data is trapped inside a span event. We need to surface it to the span level to make it more easily accessible later.
 :::
 
 ## {.spaced .center data-transition="none"}
@@ -499,7 +455,9 @@ To turn **trace data** into **metric data**, we need two things:
 2. Turn span data into **Prometheus metrics**
 
 ::: {.notes}
-Second goal: once the data is on the span, we need to convert those spans into counter metrics that Prometheus can scrape and Flagger can query.
+Second goal: once the data is on the span, we need to convert those spans into metrics that Prometheus can scrape and Flagger can query.
+
+We are going to accomplish these goals by using...
 :::
 
 ## {.center}
@@ -507,7 +465,7 @@ Second goal: once the data is on the span, we need to convert those spans into c
 <h2 style="font-size: 1.6em;">The OpenTelemetry Collector</h2>
 
 ::: {.notes}
-Introduce the collector concept. The audience hasn't seen it explained yet.
+The OpenTelemetry Collector is a pipeline that receives, processes, and exports telemetry
 :::
 
 ## {.center data-transition="none"}
@@ -517,32 +475,18 @@ Introduce the collector concept. The audience hasn't seen it explained yet.
 <p style="font-size: 1.2em;">A pipeline that receives, processes, and exports telemetry</p>
 
 ::: {.notes}
-It sits between the apps and the backends (Prometheus, Datadog). Data flows in, gets transformed, and flows out.
+It sits between the app and the observability backends (which for us is Prometheus and Datadog).
+
+Telemetry data flows in to the collector, gets transformed, and flows out.
 :::
 
-## The Collector Pipeline {data-transition="none"}
-
-```{mermaid}
-%%| fig-width: 10
-graph LR
-  apps["Server"] -->|"spans, events, spanContext"| collector
-  subgraph collector ["OTel Collector"]
-    empty[" "]
-  end
-  style empty fill:none,stroke:none
-  style collector fill:none,stroke:#00897B,stroke-width:2px
-```
-
-::: {.notes}
-Show the basic collector pipeline. Apps send traces via OTLP. The collector is a black box for now.
-:::
 
 ## {.spaced .center}
 
-So what mechanism does the collector use to help us with our two goals?
+What mechanism does the collector use to help us with our two goals?
 
 ::: {.notes}
-Rhetorical question. Let it hang.
+So what mechanism does the collector use to help us with our two goals?
 :::
 
 ## {.center}
@@ -550,7 +494,7 @@ Rhetorical question. Let it hang.
 <p style="font-size: 2.5em; font-weight: bold;">Processors</p>
 
 ::: {.notes}
-One word. Let it land.
+Processors.
 :::
 
 ## {.center data-transition="none"}
@@ -558,31 +502,71 @@ One word. Let it land.
 <p style="font-size: 1.2em;">**Processors** are pluggable components that transform telemetry as it flows through the collector</p>
 
 ::: {.notes}
-Define what a processor is. Then show examples.
+**Processors** are pluggable components that transform telemetry as it flows through the collector.
 :::
 
 ## {.spaced data-transition="none"}
 
 Community-supported processors include:
 
-::: {.fragment}
+::: {.notes}
+Community-supported processors include:
+:::
+
+## {.spaced data-transition="none"}
+
+Community-supported processors include:
+
 - **Filter** out high-churn, noisy telemetry data
-:::
-
-::: {.fragment}
-- **Batch** spans together for efficient export
-:::
-
-::: {.fragment}
-- **Redact** sensitive fields before export
-:::
-
-::: {.fragment}
-- **Enrich** spans with Kubernetes pod and node metadata
-:::
 
 ::: {.notes}
-The collector ecosystem has many processors. These are just a few examples. The point is: you compose them into pipelines to shape your telemetry however you need. We're going to use two specific ones.
+Processors that filter out high-churn, noisy telemetry data
+:::
+
+## {.spaced data-transition="none"}
+
+Community-supported processors include:
+
+- **Filter** out high-churn, noisy telemetry data
+
+- **Batch** spans together for efficient export
+
+::: {.notes}
+Processors that **Batch** spans together for efficient export
+:::
+
+## {.spaced data-transition="none"}
+
+Community-supported processors include:
+
+- **Filter** out high-churn, noisy telemetry data
+
+- **Batch** spans together for efficient export
+
+- **Redact** sensitive fields before export
+
+::: {.notes}
+Processors that **Redact** sensitive fields before export
+:::
+
+## {.spaced data-transition="none"}
+
+Community-supported processors include:
+
+- **Filter** out high-churn, noisy telemetry data
+
+- **Batch** spans together for efficient export
+
+- **Redact** sensitive fields before export
+
+- **Enrich** spans with Kubernetes pod and node metadata
+
+::: {.notes}
+Processors that **Enrich** spans with Kubernetes pod and node metadata
+
+The collector ecosystem has many processors. These are just a few examples.
+
+You can compose one or many processors into pipelines to shape your telemetry however you need. 
 :::
 
 ## The Collector Pipeline {data-transition="none"}
@@ -598,10 +582,8 @@ graph LR
   style collector fill:none,stroke:#00897B,stroke-width:2px
 ```
 
-We will use two **processors**
-
 ::: {.notes}
-Empty collector with the setup line. The audience sees the collector and hears "two processors."
+For our rollout, we used two specific processors...
 :::
 
 ## The Collector Pipeline {data-transition="none"}
@@ -620,25 +602,9 @@ graph LR
 **Transform Processor** — make span event data accessible at the span level
 
 ::: {.notes}
-The Transform processor promotes span event attributes up to the parent span so downstream processors can read them.
+... the Transform processor that promotes span event attributes up to the parent span so downstream processors can read them...
 :::
 
-## The Transform Processor {data-transition="none"}
-
-```{.yaml code-line-numbers="|2-4|5-8"}
-processors:
-  transform:
-    trace_statements:
-      - context: spanevent
-        statements:
-          - set(span.attributes["gen_ai.evaluation.score.label"],
-                attributes["gen_ai.evaluation.score.label"])
-            where name == "gen_ai.evaluation.result"
-```
-
-::: {.notes}
-Walk through the real YAML. First highlight: we're in the transform processor, operating in the spanevent context. Second highlight: we read the attribute from the event and write it to the parent span. This runs for every span event named gen_ai.evaluation.result. Same pattern repeats for score.value and story.part.
-:::
 
 ## The Collector Pipeline {data-transition="none"}
 
@@ -657,25 +623,9 @@ graph LR
 **Spanmetrics Processor** — turn spans into a counter metric Prometheus can understand
 
 ::: {.notes}
-The spanmetrics connector reads the promoted attributes on each span and produces a counter metric called gen_ai_calls_total.
+... And the spanmetrics connector which reads the promoted attributes on each span and produces a counter metric called gen_ai_calls_total.
 :::
 
-## The Spanmetrics Connector {data-transition="none"}
-
-```{.yaml code-line-numbers="|2-3|4-7|8"}
-connectors:
-  spanmetrics:
-    namespace: gen_ai
-    dimensions:
-      - name: gen_ai.evaluation.score.label
-      - name: story.name
-      - name: story.part
-    metrics_flush_interval: 15s
-```
-
-::: {.notes}
-Walk through the real YAML. First highlight: spanmetrics connector with namespace gen_ai (produces metric gen_ai_calls_total). Second highlight: dimensions — these are the promoted attributes from the transform step, plus story.name to distinguish variants. Third highlight: flush every 15 seconds. The result is a counter metric with dimensions for story_name, score.label, and story.part.
-:::
 
 ## The Collector Pipeline {data-transition="none"}
 
@@ -696,30 +646,9 @@ graph LR
 We can now send metrics to **Prometheus**
 
 ::: {.notes}
-First output: Prometheus. In-cluster metrics store.
+We can now send metrics to **Prometheus**, where Flagger can use them
 :::
 
-## The Collector Pipeline {data-transition="none"}
-
-```{mermaid}
-%%| fig-width: 10
-graph LR
-  apps["Server"] -->|"spans, events, spanContext"| collector
-  subgraph collector ["OTel Collector"]
-    transform["Transform"] --> spanmetrics["Spanmetrics"]
-  end
-  collector --> prometheus["Prometheus"]
-  style transform fill:#e8f5f3,stroke:#00897B
-  style spanmetrics fill:#e8f5f3,stroke:#00897B
-  style collector fill:none,stroke:#00897B,stroke-width:2px
-  style prometheus fill:#e0f2f1,stroke:#4DB6AC
-```
-
-**Flagger** queries Prometheus to make rollout decisions
-
-::: {.notes}
-Flagger runs PromQL queries against Prometheus to make canary decisions. This is the in-cluster path.
-:::
 
 ## The Collector Pipeline {data-transition="none"}
 
@@ -742,31 +671,9 @@ graph LR
 We also send data to **Datadog**
 
 ::: {.notes}
-Second output: Datadog. The collector also sends data to Datadog via a separate pipeline.
-:::
+We also send telemetry data to Datadog. Datadog receives metrics AND traces via separate pipelines (datadog exporter + datadog/connector).
 
-## The Collector Pipeline {data-transition="none"}
-
-```{mermaid}
-%%| fig-width: 10
-graph LR
-  apps["Server"] -->|"spans, events, spanContext"| collector
-  subgraph collector ["OTel Collector"]
-    transform["Transform"] --> spanmetrics["Spanmetrics"]
-  end
-  collector --> prometheus["Prometheus"]
-  collector --> datadog["Datadog"]
-  style transform fill:#e8f5f3,stroke:#00897B
-  style spanmetrics fill:#e8f5f3,stroke:#00897B
-  style collector fill:none,stroke:#00897B,stroke-width:2px
-  style prometheus fill:#e0f2f1,stroke:#4DB6AC
-  style datadog fill:#e0f2f1,stroke:#4DB6AC
-```
-
-**Datadog** captures data for live dashboards
-
-::: {.notes}
-Datadog receives traces and metrics via separate pipelines (datadog exporter + datadog/connector). The diagram simplifies this. For the audience: one collector, two outputs, two purposes.
+The connector generates additional metrics from traces, and the exporter ships data out to a Datadog endpoint. Together they give Datadog both raw traces and pre-computed metrics.
 :::
 
 # The Platform {.center data-transition="none"}
@@ -926,25 +833,35 @@ Section divider: Round 2 Live Demo. Now the audience understands the infrastruct
 PRESENTER CUE: QR code goes to story-app-2. Advance story parts from the admin panel. Let 2-3 story parts play out (~3-4 minutes). This time, also narrate what's happening: "The platform is watching your votes right now. If one model pulls ahead, traffic will shift."
 :::
 
-## [Live Dashboard](https://app.datadoghq.com/dashboard/68y-xeg-j6s?tv_mode=true) {.center}
+## [Live Dashboard](https://app.datadoghq.com/dashboard/68y-xeg-j6s) {.center}
 
-Watch the votes — and the **canary progression**:
+Watch the votes come in:
 
-**[Open Datadog Dashboard](https://app.datadoghq.com/dashboard/68y-xeg-j6s?tv_mode=true)**
+**[Open Datadog Dashboard](https://app.datadoghq.com/dashboard/68y-xeg-j6s)**
 
 ::: {.notes}
-PRESENTER CUE: Click the link to open the Datadog dashboard in TV mode. This time, also point out the Flagger canary progression if visible — traffic weight shifting in real time. The audience can see their votes driving the rollout.
 :::
 
-## The Reveal
-
-| | Variant A | Variant B |
-|---|---|---|
-| **Tone** | Same | Same |
-| **Model** | Mistral Medium (cheap) | Opus 4.6 (expensive) |
+## Did you figure out the **two versions** this time? {.center}
 
 ::: {.notes}
-Reveal the model difference. Show the Datadog dashboard results. The expensive model might not have won — that's the point. (Model names TBD — Thomas changing to Anthropic big vs Mistral small.)
+Did you put it together?
+:::
+
+## {.center data-transition="none"}
+
+Same tone this time. Different **models**.
+
+::: {.notes}
+This time, both variants had the same tone. The difference was the model.
+:::
+
+## {.center data-transition="none"}
+
+One was cheap. One was expensive.
+
+::: {.notes}
+Variant A used Mistral Medium — a cheaper model. Variant B used Opus 4.6 — a more expensive model. Did the expensive one win?
 :::
 
 ## {.center data-transition="none"}
@@ -986,6 +903,12 @@ Show the complete cycle — audience votes are literally controlling the infrast
 
 ::: {.notes}
 Wrap-up slide. Recap the key technologies and the audience's role. Emphasize: this isn't hypothetical — they just did it, live.
+:::
+
+## {background-image="images/whitney-lee.png" background-size="contain" background-color="white"}
+
+::: {.notes}
+Whitney Lee — Developer Advocate at Datadog. whitneylee.com
 :::
 
 ## {background-image="images/thomas/thomas-vitale.png" background-size="contain" background-color="white"}
