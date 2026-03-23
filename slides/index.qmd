@@ -317,7 +317,7 @@ Because these are standardized, any OpenTelemetry tool (Datadog, Jaeger, Grafana
 **[See a real LLM trace in Datadog](https://app.datadoghq.com/llm/traces/trace/4e75d9f0306a4e11beeab2054f88d011?selectedTab=overview&spanId=17445975645256376604)**
 
 ::: {.notes}
-Click this link to open an LLM trace in Datadog - these are capuring calls instrumented with OpenTelemetry GenAI semantic conventions
+Click this link to open an LLM trace in Datadog - these are capturing calls instrumented with OpenTelemetry GenAI semantic conventions
 :::
 
 ## The Journey of a 👍 {.center data-transition="fade"}
